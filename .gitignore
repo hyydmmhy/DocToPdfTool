@@ -1,0 +1,19 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+*.sln.docstates
+*.userprefs
+
+## Publish output
+publish/
+
+## IDE
+.vs/
+.vscode/
+*.DotSettings.user
+
+## OS
+Thumbs.db
+.DS_Store

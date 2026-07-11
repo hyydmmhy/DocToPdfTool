@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net48</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <LangVersion>latest</LangVersion>
+    <RootNamespace>DocToPdfTool</RootNamespace>
+    <AssemblyName>DocToPdfTool</AssemblyName>
+    <Version>1.0.0.0</Version>
+    <AssemblyTitle>DocToPdfTool</AssemblyTitle>
+    <Description>DocToPdfTool - 文档转PDF工具，支持WPS/Office双引擎，支持Word/Excel/PPT等格式</Description>
+    <Company></Company>
+    <Product>DocToPdfTool</Product>
+    <Copyright>Copyright © 2026. MIT License.</Copyright>
+    <ApplicationIcon>icons\DocToPdfTool.ico</ApplicationIcon>
+    <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(SingleFile)'=='true'">
+    <PackageReference Include="Costura.Fody" Version="5.7.0" PrivateAssets="all" />
+    <PackageReference Include="Fody" Version="6.8.0" PrivateAssets="all" />
+  </ItemGroup>
+</Project>
