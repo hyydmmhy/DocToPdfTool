@@ -29,6 +29,21 @@ namespace DocToPdfTool
 
         private void OnStartup(object sender, StartupEventArgs e)
         {
+            // 全局异常处理
+            this.DispatcherUnhandledException += (s, ex) =>
+            {
+                MessageBox.Show($"程序遇到未处理的异常:\n{ex.Exception.Message}\n\n堆栈:\n{ex.Exception.StackTrace}",
+                    "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                ex.Handled = true;
+            };
+
+            AppDomain.CurrentDomain.UnhandledException += (s, ex) =>
+            {
+                var exObj = ex.ExceptionObject as Exception;
+                MessageBox.Show($"后台线程异常:\n{exObj?.Message}\n\n堆栈:\n{exObj?.StackTrace}",
+                    "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+            };
+
             bool createdNew;
             _mutex = new Mutex(true, "DocToPdfTool_SingleInstance", out createdNew);
             _eventWaitHandle = new EventWaitHandle(false, EventResetMode.AutoReset, "DocToPdfTool_ActivateEvent");
