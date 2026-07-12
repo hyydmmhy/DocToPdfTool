@@ -1,6 +1,6 @@
 # DocToPdfTool
 
-多功能文档格式转换工具，支持 **文档转 PDF** 和 **PDF 转 Word** 双向转换。
+多功能文档格式转换工具，支持 **文档转 PDF**、**PDF 转 Word** 和 **PDF 转图片** 等多种转换功能。
 
 ## 功能
 
@@ -16,6 +16,13 @@
 - **拖拽添加**：支持拖拽 PDF 文件到列表
 - **自动窗口隐藏**：后台静默运行 Word，自动隐藏 Word 窗口
 
+### PDF 转图片
+- **Windows 内置引擎**：基于 Windows 10/11 内置 PDF 渲染引擎（`Windows.Data.Pdf`），无需额外安装软件
+- **批量转换**：支持同时添加多个 PDF 文件，每页生成一张图片
+- **拖拽添加**：支持拖拽 PDF 文件到列表
+- **可调参数**：支持 DPI（150/300/600）、缩放倍率（1×~5×）、输出格式（JPG/PNG）
+- **零依赖**：不依赖 pdfium.dll、Ghostscript 或 Office 组件
+
 ## 使用
 
 ### 文档转 PDF
@@ -30,6 +37,13 @@
 2. 点击「添加PDF文件」或拖拽 PDF 文件到列表
 3. 点击「转换为 Word」
 4. 转换完成后自动打开输出目录（桌面/PDF转Word输出）
+
+### PDF 转图片
+1. 点击左侧「PDF转图片」切换到 PDF 转图片界面
+2. 点击「添加PDF文件」或拖拽 PDF 文件到列表
+3. 设置缩放倍率、输出格式、DPI（可选，默认值即可获得清晰图片）
+4. 点击「转换为图片」
+5. 转换完成后自动打开输出目录（桌面/PDF转图片输出）
 
 ## 构建
 
@@ -53,6 +67,7 @@ publish_single.bat
 - Word COM 自动化（PDF 转 Word，3 层回退创建真实 Word 实例）
 - Win32 API 窗口守卫（抑制 Office 弹窗）
 - WMI 进程监控 + WinEventHook（Word 窗口自动隐藏）
+- Windows.Data.Pdf 内置 PDF 渲染引擎（PDF 转图片，Windows 10+）
 - Costura.Fody（单文件打包）
 
 ## 致谢

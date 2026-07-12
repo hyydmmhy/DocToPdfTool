@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Threading;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -12,11 +13,11 @@ using Microsoft.Win32;
 
 namespace DocToPdfTool.Pages
 {
-    public partial class PdfToWordPage : UserControl
+    public partial class PdfToImagePage : UserControl
     {
         private readonly ObservableCollection<PdfFileItem> _files = new ObservableCollection<PdfFileItem>();
 
-        public PdfToWordPage()
+        public PdfToImagePage()
         {
             InitializeComponent();
             FileListView.ItemsSource = _files;
@@ -71,7 +72,7 @@ namespace DocToPdfTool.Pages
 
             double total = FileListView.ActualWidth - 14;
             double nameW = Math.Max(150, total * 0.30);
-            double pathW = Math.Max(100, total - nameW - 70);
+            double pathW = Math.Max(100, total - nameW - 60);
 
             if (Math.Abs(gv.Columns[0].Width - nameW) > 1)
                 gv.Columns[0].Width = nameW;
@@ -94,6 +95,31 @@ namespace DocToPdfTool.Pages
                 return;
             }
 
+            // 确定输出目录
+            string defaultOutputDir = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
+                "PDF转图片输出");
+            if (!Directory.Exists(defaultOutputDir))
+                Directory.CreateDirectory(defaultOutputDir);
+
+            // 读取设置
+            double scale = 1.5;
+            if (CmbScale.SelectedItem is ComboBoxItem scaleItem &&
+                double.TryParse(scaleItem.Content.ToString(), out double parsedScale))
+            {
+                scale = parsedScale;
+            }
+
+            int dpi = 300;
+            if (CmbDpi.SelectedItem is ComboBoxItem dpiItem &&
+                int.TryParse(dpiItem.Content.ToString(), out int parsedDpi))
+            {
+                dpi = parsedDpi;
+            }
+
+            bool usePng = CmbFormat.SelectedItem is ComboBoxItem fmtItem &&
+                          fmtItem.Content.ToString().Equals("PNG", StringComparison.OrdinalIgnoreCase);
+
             BtnConvert.IsEnabled = false;
             BtnAddFiles.IsEnabled = false;
             TxtConversionStatus.Text = "准备中...";
@@ -102,27 +128,60 @@ namespace DocToPdfTool.Pages
 
             try
             {
-                Exception staError = null;
+                bool hasError = false;
+                string errorMsg = null;
+
                 await Task.Run(() =>
                 {
-                    var staThread = new Thread(() =>
-                    {
-                        try
-                        {
-                            DoConversion(snapshot);
-                        }
-                        catch (Exception ex)
-                        {
-                            staError = ex;
-                        }
-                    });
-                    staThread.SetApartmentState(ApartmentState.STA);
-                    staThread.Start();
-                    staThread.Join();
+                    int total = snapshot.Count;
+                    int completed = 0;
 
-                    if (staError != null)
-                        throw new Exception("转换失败: " + staError.Message, staError);
+                    using (var converter = new PdfToImageConverter())
+                    {
+                        converter.Dpi = dpi;
+                        converter.Scale = scale;
+                        converter.OutputFormat = usePng
+                            ? System.Drawing.Imaging.ImageFormat.Png
+                            : System.Drawing.Imaging.ImageFormat.Jpeg;
+
+                        foreach (var file in snapshot)
+                        {
+                            completed++;
+
+                            Dispatcher.Invoke(() =>
+                            {
+                                TxtConversionStatus.Text = $"正在转换 ({completed}/{total}) {file.FileName}";
+                            });
+
+                            try
+                            {
+                                converter.Convert(file.FilePath, defaultOutputDir);
+                            }
+                            catch (Exception ex)
+                            {
+                                hasError = true;
+                                errorMsg = $"{file.FileName}: {ex.Message}";
+                            }
+                            finally
+                            {
+                                // 每个文件转换完立即回收，避免高分辨率位图在大对象堆上持续堆积
+                                ReleaseMemory();
+                            }
+                        }
+                    }
                 });
+
+                if (hasError)
+                {
+                    TxtConversionStatus.Text = "部分文件转换失败";
+                    MessageBox.Show($"以下文件转换失败:\n{errorMsg}",
+                        "部分文件失败", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+                else
+                {
+                    TxtConversionStatus.Text = "全部转换完成";
+                    try { System.Diagnostics.Process.Start(defaultOutputDir); } catch { }
+                }
             }
             catch (Exception ex)
             {
@@ -131,67 +190,36 @@ namespace DocToPdfTool.Pages
             }
             finally
             {
+                // 强制回收内存，释放 WinRT 和 GDI+ 资源
+                ReleaseMemory();
+
                 BtnConvert.IsEnabled = true;
                 BtnAddFiles.IsEnabled = true;
+            }
+        }
+
+        /// <summary>
+        /// 强制GC回收 + 压缩大对象堆 + 将释放出来的内存真正归还给操作系统。
+        /// 高DPI渲染的位图会进入大对象堆(LOH)，普通GC.Collect()不会压缩LOH、
+        /// 也不会把已释放的页面还给OS，所以任务管理器里数字不会掉——这里把这两步都补上。
+        /// </summary>
+        private static void ReleaseMemory()
+        {
+            try
+            {
+                System.Runtime.GCSettings.LargeObjectHeapCompactionMode =
+                    System.Runtime.GCLargeObjectHeapCompactionMode.CompactOnce;
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
+                GC.Collect();
+
+                EmptyWorkingSet(Process.GetCurrentProcess().Handle);
             }
+            catch { }
         }
 
-        private void DoConversion(List<PdfFileItem> files)
-        {
-            string defaultOutputDir = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
-                "PDF转Word输出");
-
-            var failedFiles = new List<string>();
-
-            using (var converter = new PdfToWordConverter())
-            {
-                converter.Initialize();
-
-                int total = files.Count;
-                int completed = 0;
-
-                foreach (var file in files)
-                {
-                    completed++;
-
-                    Dispatcher.Invoke(() =>
-                    {
-                        TxtConversionStatus.Text = $"正在转换 ({completed}/{total}) {file.FileName}";
-                    });
-
-                    string outputDir = defaultOutputDir;
-                    if (!Directory.Exists(outputDir))
-                        Directory.CreateDirectory(outputDir);
-
-                    try
-                    {
-                        converter.Convert(file.FilePath, outputDir);
-                    }
-                    catch (Exception ex)
-                    {
-                        failedFiles.Add($"{file.FileName}: {ex.Message}");
-                    }
-                }
-            }
-
-            Dispatcher.Invoke(() =>
-            {
-                if (failedFiles.Count > 0)
-                {
-                    TxtConversionStatus.Text = $"完成，{failedFiles.Count} 个文件转换失败";
-                    MessageBox.Show($"以下文件转换失败:\n{string.Join("\n", failedFiles)}",
-                        "部分文件失败", MessageBoxButton.OK, MessageBoxImage.Warning);
-                }
-                else
-                {
-                    TxtConversionStatus.Text = "全部转换完成";
-                    try { System.Diagnostics.Process.Start(defaultOutputDir); } catch { }
-                }
-            });
-        }
+        [DllImport("psapi.dll")]
+        private static extern bool EmptyWorkingSet(IntPtr hProcess);
 
         private void AddFiles(IEnumerable<string> filePaths)
         {

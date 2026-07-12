@@ -60,7 +60,9 @@ namespace DocToPdfTool.Utils
             }
             finally
             {
-                doc.Close();
+                try { doc.Close(); } catch { }
+                try { Marshal.ReleaseComObject((object)doc); } catch { }
+                doc = null;
             }
         }
 
@@ -79,23 +81,44 @@ namespace DocToPdfTool.Utils
                 {
                     foreach (dynamic sheet in xls.Worksheets)
                     {
-                        sheet.Activate();
-                        dynamic usedRange = sheet.UsedRange;
-                        usedRange.Columns.AutoFit();
+                        dynamic usedRange = null;
+                        dynamic pageSetup = null;
+                        try
+                        {
+                            sheet.Activate();
+                            usedRange = sheet.UsedRange;
+                            usedRange.Columns.AutoFit();
 
-                        dynamic pageSetup = sheet.PageSetup;
-                        var psType = pageSetup.GetType();
-                        psType.InvokeMember("Zoom", BindingFlags.SetProperty, null, pageSetup, new object[] { false });
-                        psType.InvokeMember("FitToPagesWide", BindingFlags.SetProperty, null, pageSetup, new object[] { 1 });
+                            pageSetup = sheet.PageSetup;
+                            var psType = pageSetup.GetType();
+                            psType.InvokeMember("Zoom", BindingFlags.SetProperty, null, pageSetup, new object[] { false });
+                            psType.InvokeMember("FitToPagesWide", BindingFlags.SetProperty, null, pageSetup, new object[] { 1 });
+                        }
+                        finally
+                        {
+                            if (pageSetup != null) try { Marshal.ReleaseComObject((object)pageSetup); } catch { }
+                            if (usedRange != null) try { Marshal.ReleaseComObject((object)usedRange); } catch { }
+                            try { Marshal.ReleaseComObject((object)sheet); } catch { }
+                        }
                     }
 
-                    ((dynamic)xls.Worksheets[1]).Activate();
-                    xls.ExportAsFixedFormat(0, outputFile, 0, true, false);
-                    xls.Saved = true;
+                    dynamic firstSheet = xls.Worksheets[1];
+                    try
+                    {
+                        firstSheet.Activate();
+                        xls.ExportAsFixedFormat(0, outputFile, 0, true, false);
+                        xls.Saved = true;
+                    }
+                    finally
+                    {
+                        try { Marshal.ReleaseComObject((object)firstSheet); } catch { }
+                    }
                 }
                 finally
                 {
-                    xls.Close();
+                    try { xls.Close(); } catch { }
+                    try { Marshal.ReleaseComObject((object)xls); } catch { }
+                    xls = null;
                 }
             });
         }
@@ -127,13 +150,16 @@ namespace DocToPdfTool.Utils
                             }
                             finally
                             {
-                                ppt.Close();
+                                try { ppt.Close(); } catch { }
+                                try { Marshal.ReleaseComObject((object)ppt); } catch { }
+                                ppt = null;
                             }
                         });
                     }
                     finally
                     {
                         try { app.Quit(); } catch { }
+                        try { Marshal.ReleaseComObject((object)app); } catch { }
                     }
                 }
                 catch (Exception ex) { threadError = ex; }
@@ -276,6 +302,7 @@ namespace DocToPdfTool.Utils
                     UnhookWinEvent(hook);
             });
             hookThread.SetApartmentState(ApartmentState.STA);
+            hookThread.IsBackground = true; // 关键修复：前台线程会阻止进程退出
             hookThread.Start();
 
             while (hook == IntPtr.Zero && hookThread.IsAlive)
@@ -344,6 +371,7 @@ namespace DocToPdfTool.Utils
             if (_officeApp != null)
             {
                 try { _officeApp.Quit(); } catch { }
+                try { Marshal.ReleaseComObject((object)_officeApp); } catch { }
                 _officeApp = null;
             }
 
@@ -361,6 +389,7 @@ namespace DocToPdfTool.Utils
                 if (_officeApp != null)
                 {
                     try { _officeApp.Quit(); } catch { }
+                    try { Marshal.ReleaseComObject((object)_officeApp); } catch { }
                     _officeApp = null;
                 }
                 _disposed = true;

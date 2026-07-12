@@ -147,6 +147,8 @@ namespace DocToPdfTool.Pages
             finally
             {
                 BtnConvert.IsEnabled = true;
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
             }
         }
 

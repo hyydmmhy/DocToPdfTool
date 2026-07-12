@@ -12,6 +12,8 @@ namespace DocToPdfTool
     {
         private static Mutex _mutex;
         private static EventWaitHandle _eventWaitHandle;
+        private static bool _shutdownRequested;
+        private Thread _waitThread;
 
         [DllImport("user32.dll")]
         private static extern bool SetForegroundWindow(IntPtr hWnd);
@@ -65,38 +67,70 @@ namespace DocToPdfTool
                 return;
             }
 
-            var waitThread = new Thread(() =>
+            // 注册退出事件，确保线程退出
+            this.Exit += (s, e) =>
             {
-                while (true)
+                _shutdownRequested = true;
+                _eventWaitHandle?.Set();
+
+                // 保险丝：正常的 Dispatcher 关闭流程走完后，如果还有游离的
+                // 前台线程（比如某个转换器忘了设 IsBackground）导致进程赖着不退，
+                // 这里强制终止进程，保证点右上角关闭一定能真正退出。
+                Environment.Exit(0);
+            };
+
+            _waitThread = new Thread(() =>
+            {
+                while (!_shutdownRequested)
                 {
-                    _eventWaitHandle.WaitOne();
-                    Dispatcher.BeginInvoke((Action)(() =>
+                    try
                     {
-                        var w = Current.MainWindow;
-                        if (w == null) return;
+                        // WaitOne 返回 true 表示收到了激活信号，false 是超时
+                        bool signaled = _eventWaitHandle.WaitOne(1000);
+                        if (_shutdownRequested || !signaled) continue;
 
-                        if (w.WindowState == WindowState.Minimized)
-                            w.WindowState = WindowState.Normal;
-
-                        var hwnd = new WindowInteropHelper(w).Handle;
-                        if (hwnd != IntPtr.Zero)
+                        Current.Dispatcher.BeginInvoke((Action)(() =>
                         {
-                            if (IsIconic(hwnd))
-                                ShowWindow(hwnd, SW_RESTORE);
-                            SetForegroundWindow(hwnd);
-                        }
+                            if (_shutdownRequested) return;
+                            var w = Current.MainWindow;
+                            if (w == null) return;
 
-                        w.Show();
-                        w.Activate();
-                        w.Topmost = true;
-                        w.Topmost = false;
-                    }));
+                            if (w.WindowState == WindowState.Minimized)
+                                w.WindowState = WindowState.Normal;
+
+                            var hwnd = new WindowInteropHelper(w).Handle;
+                            if (hwnd != IntPtr.Zero)
+                            {
+                                if (IsIconic(hwnd))
+                                    ShowWindow(hwnd, SW_RESTORE);
+                                SetForegroundWindow(hwnd);
+                            }
+
+                            w.Show();
+                            w.Activate();
+                            w.Topmost = true;
+                            w.Topmost = false;
+                        }));
+                    }
+                    catch { break; }
                 }
             })
             { IsBackground = true };
-            waitThread.Start();
+            _waitThread.Start();
 
-            new MainWindow().Show();
+            var mainWindow = new MainWindow();
+            mainWindow.Closed += (s, e) =>
+            {
+                _shutdownRequested = true;
+                // 强制终止进程——WPF 正常关闭流程可能被 WinRT 残留线程阻塞
+                try
+                {
+                    var proc = Process.GetCurrentProcess();
+                    proc.Kill();
+                }
+                catch { }
+            };
+            mainWindow.Show();
         }
     }
 }
