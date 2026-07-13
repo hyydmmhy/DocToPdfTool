@@ -218,8 +218,10 @@ namespace DocToPdfTool.Utils
             dynamic xls = _wpsApp.Application.Workbooks.Open(sourceFile);
             try
             {
-                foreach (dynamic sheet in xls.Worksheets)
+                int sheetCount = xls.Worksheets.Count;
+                for (int i = 1; i <= sheetCount; i++)
                 {
+                    dynamic sheet = xls.Worksheets[i];
                     sheet.Activate();
 
                     dynamic usedRange = sheet.UsedRange;

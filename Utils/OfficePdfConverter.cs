@@ -79,25 +79,38 @@ namespace DocToPdfTool.Utils
                 dynamic xls = _officeApp.Application.Workbooks.Open(sourceFile);
                 try
                 {
-                    foreach (dynamic sheet in xls.Worksheets)
+                    int sheetCount = xls.Worksheets.Count;
+                    for (int i = 1; i <= sheetCount; i++)
                     {
-                        dynamic usedRange = null;
-                        dynamic pageSetup = null;
+                        dynamic sheet = xls.Worksheets[i];
                         try
                         {
                             sheet.Activate();
-                            usedRange = sheet.UsedRange;
-                            usedRange.Columns.AutoFit();
 
-                            pageSetup = sheet.PageSetup;
-                            var psType = pageSetup.GetType();
-                            psType.InvokeMember("Zoom", BindingFlags.SetProperty, null, pageSetup, new object[] { false });
-                            psType.InvokeMember("FitToPagesWide", BindingFlags.SetProperty, null, pageSetup, new object[] { 1 });
+                            dynamic usedRange = sheet.UsedRange;
+                            try
+                            {
+                                usedRange.Columns.AutoFit();
+                            }
+                            finally
+                            {
+                                if (usedRange != null) try { Marshal.ReleaseComObject((object)usedRange); } catch { }
+                            }
+
+                            dynamic pageSetup = sheet.PageSetup;
+                            try
+                            {
+                                var psType = pageSetup.GetType();
+                                psType.InvokeMember("Zoom", BindingFlags.SetProperty, null, pageSetup, new object[] { false });
+                                psType.InvokeMember("FitToPagesWide", BindingFlags.SetProperty, null, pageSetup, new object[] { 1 });
+                            }
+                            finally
+                            {
+                                if (pageSetup != null) try { Marshal.ReleaseComObject((object)pageSetup); } catch { }
+                            }
                         }
                         finally
                         {
-                            if (pageSetup != null) try { Marshal.ReleaseComObject((object)pageSetup); } catch { }
-                            if (usedRange != null) try { Marshal.ReleaseComObject((object)usedRange); } catch { }
                             try { Marshal.ReleaseComObject((object)sheet); } catch { }
                         }
                     }
