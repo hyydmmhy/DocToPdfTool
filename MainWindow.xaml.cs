@@ -34,6 +34,7 @@ namespace DocToPdfTool
                         "DocToPdf" => new Pages.DocToPdfPage(),
                         "PdfToWord" => new Pages.PdfToWordPage(),
                         "PdfToImage" => new Pages.PdfToImagePage(),
+                        "PdfToExcel" => new Pages.PdfToExcelPage(),
                         _ => throw new ArgumentException($"Unknown page: {pageKey}")
                     };
                     _pages[pageKey] = page;

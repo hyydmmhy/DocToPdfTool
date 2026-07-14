@@ -1,6 +1,6 @@
 # DocToPdfTool
 
-多功能文档格式转换工具，支持 **文档转 PDF**、**PDF 转 Word** 和 **PDF 转图片** 等多种转换功能。
+多功能文档格式转换工具，支持 **文档转 PDF**、**PDF 转 Word**、**PDF 转 Excel** 和 **PDF 转图片** 等多种转换功能。
 
 ## 功能
 
@@ -15,6 +15,16 @@
 - **批量转换**：支持同时添加多个 PDF 文件，逐个转换
 - **拖拽添加**：支持拖拽 PDF 文件到列表
 - **自动窗口隐藏**：后台静默运行 Word，自动隐藏 Word 窗口
+
+### PDF 转 Excel
+- **PdfPig 解析引擎**：基于 PdfPig 开源 PDF 文本提取库，不依赖 Office 组件
+- **表格自动识别**：智能检测页面的表格结构，自动识别列边界和表头
+- **文本换行合并**：自动合并因单元格内文本换行而被拆分的行，还原表格原始结构
+- **页眉页脚过滤**：自动去除 PDF 页面的页眉页脚干扰内容
+- **非表格降级**：非表格页面自动降级为文本行输出，避免数据丢失
+- **多页支持**：多页 PDF 每页生成独立 Sheet，单页则输出为 Sheet1
+- **Excel 原生写入**：纯 XML 方式生成 `.xlsx` 文件，无需 Excel 或任何 Office 组件
+- **拖拽添加**：支持拖拽 PDF 文件到列表
 
 ### PDF 转图片
 - **Windows 内置引擎**：基于 Windows 10/11 内置 PDF 渲染引擎（`Windows.Data.Pdf`），无需额外安装软件
@@ -37,6 +47,12 @@
 2. 点击「添加PDF文件」或拖拽 PDF 文件到列表
 3. 点击「转换为 Word」
 4. 转换完成后自动打开输出目录（桌面/PDF转Word输出）
+
+### PDF 转 Excel
+1. 点击左侧「PDF转Excel」切换到 PDF 转 Excel 界面
+2. 点击「添加PDF文件」或拖拽 PDF 文件到列表
+3. 点击「转换为 Excel」
+4. 转换完成后自动打开输出目录（桌面/PDF转Excel输出）
 
 ### PDF 转图片
 1. 点击左侧「PDF转图片」切换到 PDF 转图片界面
@@ -65,6 +81,8 @@ publish_single.bat
 - COM 自动化（WPS / Office 后期绑定）
 - Edge Chromium headless（HTML 转 PDF）
 - Word COM 自动化（PDF 转 Word，3 层回退创建真实 Word 实例）
+- PdfPig 开源 PDF 文本提取（PDF 转 Excel，无需 Office 组件）
+- 纯 XML xlsx 生成（`ZipArchive` + `XElement`，零 Office 依赖）
 - Win32 API 窗口守卫（抑制 Office 弹窗）
 - WMI 进程监控 + WinEventHook（Word 窗口自动隐藏）
 - Windows.Data.Pdf 内置 PDF 渲染引擎（PDF 转图片，Windows 10+）

@@ -19,16 +19,17 @@ dotnet build -c Release
 
 ## Project Architecture
 
-**A WPF multi-function document conversion tool** targeting .NET Framework 4.8, with left-side navigation switching between three tools: Doc→PDF, PDF→Word, and PDF→Image.
+**A WPF multi-function document conversion tool** targeting .NET Framework 4.8, with left-side navigation switching between four tools: Doc→PDF, PDF→Word, PDF→Excel, and PDF→Image.
 
 ### UI Layout
 
 ```
 MainWindow (800x500)
 └─ DockPanel
-    ├─ Left sidebar (180px) — NavListBox with 3 items
+    ├─ Left sidebar (180px) — NavListBox with 4 items
     │   ├─ "文档转PDF" → Pages.DocToPdfPage
     │   ├─ "PDF转Word" → Pages.PdfToWordPage
+    │   ├─ "PDF转Excel" → Pages.PdfToExcelPage
     │   └─ "PDF转图片" → Pages.PdfToImagePage
     ├─ Top-right — "置顶" toggle button
     └─ ContentControl — switches between page UserControls (cached)
@@ -43,6 +44,8 @@ Pages are created once and cached in a `Dictionary<string, UserControl>`. Switch
 - **Pages/DocToPdfPage.xaml/cs** — Doc→PDF tool. WPS/Microsoft Office dual engine, Edge HTML converter. Unchanged logic, only `BtnExit_Click` adapted to `Window.GetWindow(this).Close()`.
 
 - **Pages/PdfToWordPage.xaml/cs** — PDF→Word tool. File list (add/remove/drag-drop), progress bar, convert button. Runs Word COM on a dedicated STA thread.
+
+- **Pages/PdfToExcelPage.xaml/cs** — PDF→Excel tool. File list with add/remove/drag-drop, convert button. Uses `PdfToExcelConverter` on a background thread.
 
 - **Pages/PdfToImagePage.xaml/cs** — PDF→Image tool. Batch file list with drag-drop, settings (scale/format/DPI), convert button. Uses `Task.Run` with `PdfToImageConverter`.
 
@@ -63,6 +66,13 @@ Pages are created once and cached in a `Dictionary<string, UserControl>`. Switch
   - Proper WinRT RCW cleanup via `Marshal.FinalReleaseComObject`
   - 250M pixel GDI+ limit protection via `ClampSize`
 
+- **Utils/PdfToExcelConverter.cs** — PDF→Excel engine based on PdfPig. Key features:
+  - Table auto-detection: column boundary detection via left-edge alignment clustering
+  - Split-row merging: recombines text-wrapped rows using Y-gap + X-overlap heuristics
+  - Header/footer margin filtering to exclude page noise
+  - Non-table fallback: outputs text lines as single-column rows when no table structure is detected
+  - Pure XML xlsx writer: generates `.xlsx` via `System.IO.Compression.ZipArchive` + `XElement`, zero Office dependency
+
 ### Conversion Flow: PDF → Image
 
 ```
@@ -82,6 +92,25 @@ PdfToImagePage.BtnConvert_Click
                   └─ PNG → direct Save
 ```
 
+### Conversion Flow: PDF → Excel
+
+```
+PdfToExcelPage.BtnConvert_Click
+  └─ await Task.Run
+       └─ PdfToExcelConverter.Convert(pdfPath, outputDir)
+            ├─ Convert.ExtractAllPages(pdfPath)
+            │    └─ PdfDocument.Open → foreach page:
+            │         ├─ page.GetWords()
+            │         └─ ProcessPage(words, pageHeight)
+            │              ├─ FilterMargins → exclude headers/footers
+            │              ├─ ClusterRows → group words into visual lines
+            │              ├─ IsTablePage? → column detection or text fallback
+            │              ├─ If table: MergeSplitRows → DetectColumnsByAlignment → BuildTable
+            │              └─ If not table: ExtractTextAsLines (single column)
+            └─ WriteToExcel(pagesData, outputPath)
+                 └─ ZipArchive (xlsx) → XElement sheet XML → WriteXmlEntry
+```
+
 ### Important Technical Details
 
 - **Late-bound COM** — all Office/WPS interop uses `Type.GetTypeFromProgID` + `Activator.CreateInstance` with `dynamic`. No primary interop assemblies (PIAs) needed.
@@ -90,6 +119,8 @@ PdfToImagePage.BtnConvert_Click
 - **Edge HTML conversion** — injects `@page { size: 1920px 1080px }` CSS, replaces `position:fixed/sticky` with `static`, then launches `msedge.exe --headless=new` with 60s timeout. Waits up to 6s for PDF file to stabilize after process exit.
 - **WinRT RCW cleanup** — `PdfToImageConverter` explicitly releases all WinRT objects (`PdfDocument`, `PdfPage`, `PdfPageRenderOptions`, `StorageFile`) via `Marshal.FinalReleaseComObject` in `finally` blocks to prevent memory leaks and process hang.
 - **ReleaseMemory()** — `PdfToImagePage` calls a comprehensive cleanup after conversion: `GCSettings.LargeObjectHeapCompactionMode = CompactOnce`, double `GC.Collect()`, and `EmptyWorkingSet()` to return freed pages to the OS.
+- **PdfPig text extraction** — `PdfToExcelConverter` uses `UglyToad.PdfPig` for PDF text extraction. No COM or native PDF library needed. Words are clustered into rows by Y-coordinate with adaptive tolerance, then columns detected by left-edge alignment clustering.
+- **Xlsx writer** — `PdfToExcelConverter.WriteToExcel` generates a valid `.xlsx` file using only `System.IO.Compression.ZipArchive` and `System.Xml.Linq.XElement`. Creates `[Content_Types].xml`, `_rels/.rels`, `xl/workbook.xml`, `xl/_rels/workbook.xml.rels`, and per-sheet XML files. Uses `inlineStr` cell type (no shared string table needed).
 - **Process exit guarantee** — `App.xaml.cs` hooks `MainWindow.Closed` to call `Process.Kill()` as a safety net, ensuring the process terminates even if WinRT runtime threads linger.
 - **Single-file publish** — conditionally includes `Costura.Fody` only when `SingleFile=true` MSBuild property is set.
 
@@ -99,5 +130,6 @@ PdfToImagePage.BtnConvert_Click
 - **PDF to Image requires Windows 10+** — `Windows.Data.Pdf` API is only available on Windows 10/11.
 - **Doc to PDF requires installed Office** — either WPS Office or Microsoft Office must be installed on the target machine.
 - **PDF to Word requires Microsoft Office** — Word COM automation is required; WPS Office is not supported.
+- **PDF to Excel needs no Office** — uses PdfPig (open-source) for PDF parsing and pure XML for xlsx generation. No Office or COM dependency.
 - **PDF to Image needs no extra software** — uses Windows built-in PDF renderer, zero external dependencies.
 - **x64 msedge.exe** — Edge is found via registry (`SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\msedge.exe`) or well-known install paths.
