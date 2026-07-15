@@ -155,17 +155,13 @@ namespace DocToPdfTool.Pages
 
                             try
                             {
-                                converter.Convert(file.FilePath, defaultOutputDir);
+                                converter.Convert(file.FilePath, defaultOutputDir,
+                                    onPageComplete: () => ReleaseMemory());
                             }
                             catch (Exception ex)
                             {
                                 hasError = true;
                                 errorMsg = $"{file.FileName}: {ex.Message}";
-                            }
-                            finally
-                            {
-                                // 每个文件转换完立即回收，避免高分辨率位图在大对象堆上持续堆积
-                                ReleaseMemory();
                             }
                         }
                     }

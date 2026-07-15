@@ -24,20 +24,20 @@ namespace DocToPdfTool.Utils
         private const int MaxPixelArea = 250_000_000;
 
         /// <summary>
-        /// 转换单个 PDF 所有页为图片
+        /// 转换单个 PDF 所有页为图片（同步），每页转换后可通过回调进行内存回收
         /// </summary>
         public List<string> Convert(string pdfPath, string outputDir,
-            int? startPage = null, int? endPage = null)
+            int? startPage = null, int? endPage = null, Action onPageComplete = null)
         {
-            return ConvertAsync(pdfPath, outputDir, startPage, endPage)
-                .GetAwaiter().GetResult();
+            return ConvertAsync(pdfPath, outputDir, startPage, endPage, onPageComplete)
+                .ConfigureAwait(false).GetAwaiter().GetResult();
         }
 
         /// <summary>
-        /// 异步转换单个 PDF 所有页为图片
+        /// 异步转换单个 PDF 所有页为图片，每页转换后可通过回调进行内存回收
         /// </summary>
         public async Task<List<string>> ConvertAsync(string pdfPath, string outputDir,
-            int? startPage = null, int? endPage = null)
+            int? startPage = null, int? endPage = null, Action onPageComplete = null)
         {
             var result = new List<string>();
 
@@ -46,8 +46,8 @@ namespace DocToPdfTool.Utils
 
             try
             {
-                file = await StorageFile.GetFileFromPathAsync(pdfPath);
-                pdfDoc = await PdfDocument.LoadFromFileAsync((StorageFile)file);
+                file = await StorageFile.GetFileFromPathAsync(pdfPath).AsTask().ConfigureAwait(false);
+                pdfDoc = await PdfDocument.LoadFromFileAsync((StorageFile)file).AsTask().ConfigureAwait(false);
 
                 int total = (int)pdfDoc.PageCount;
                 int start = startPage ?? 1;
@@ -61,7 +61,10 @@ namespace DocToPdfTool.Utils
                 string ext = GetExtension();
 
                 for (int i = start; i <= end; i++)
-                    ConvertPage(pdfDoc, i, baseName, ext, outputDir, result);
+                {
+                    await ConvertPageAsync(pdfDoc, i, baseName, ext, outputDir, result).ConfigureAwait(false);
+                    onPageComplete?.Invoke();
+                }
             }
             finally
             {
@@ -75,9 +78,9 @@ namespace DocToPdfTool.Utils
         }
 
         /// <summary>
-        /// 转换单页
+        /// 转换单页（异步，避免线程池死锁）
         /// </summary>
-        private void ConvertPage(PdfDocument pdfDoc, int pageIndex,
+        private async Task ConvertPageAsync(PdfDocument pdfDoc, int pageIndex,
             string baseName, string ext, string outputDir, List<string> result)
         {
             object page = null;
@@ -101,9 +104,9 @@ namespace DocToPdfTool.Utils
                 };
 
                 stream = new InMemoryRandomAccessStream();
-                var op = ((PdfPage)page).RenderToStreamAsync(stream, (PdfPageRenderOptions)options);
-                var task = op.AsTask();
-                task.GetAwaiter().GetResult();
+                // 异步等待，避免 GetAwaiter().GetResult() 导致线程池死锁
+                await ((PdfPage)page).RenderToStreamAsync(stream, (PdfPageRenderOptions)options)
+                    .AsTask().ConfigureAwait(false);
 
                 stream.Seek(0);
                 managedStream = stream.AsStream();
@@ -120,11 +123,12 @@ namespace DocToPdfTool.Utils
             }
             finally
             {
-                if (managedStream != null) try { managedStream.Dispose(); } catch { }
-                if (stream != null) try { stream.Dispose(); } catch { }
-                // 释放 WinRT RCW: PdfPage 和 PdfPageRenderOptions
+                // 先释放 PdfPage 和 PdfPageRenderOptions（它们可能持有 stream 引用）
                 SafeRelease(page);
                 SafeRelease(options);
+                // 再释放 stream（确保 stream 释放时没有 COM 引用）
+                if (managedStream != null) try { managedStream.Dispose(); } catch { }
+                if (stream != null) try { stream.Dispose(); } catch { }
             }
         }
 
