@@ -14,11 +14,11 @@ using Microsoft.Win32;
 
 namespace DocToPdfTool.Pages
 {
-    public partial class PdfToExcelPage : UserControl
+    public partial class PdfToPptPage : UserControl
     {
         private readonly ObservableCollection<PdfFileItem> _files = new ObservableCollection<PdfFileItem>();
 
-        public PdfToExcelPage()
+        public PdfToPptPage()
         {
             InitializeComponent();
             FileListView.ItemsSource = _files;
@@ -139,11 +139,11 @@ namespace DocToPdfTool.Pages
         {
             string defaultOutputDir = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
-                "PDF转Excel输出");
+                "PDF转PPT输出");
 
             var failedFiles = new List<string>();
 
-            using (var converter = new PdfToExcelConverter())
+            using (var converter = new PdfToPptConverter())
             {
                 int total = files.Count;
                 int completed = 0;
@@ -163,14 +163,14 @@ namespace DocToPdfTool.Pages
 
                     try
                     {
-                        converter.Convert(file.FilePath, outputDir);
+                        converter.Convert(file.FilePath, outputDir, () => ReleaseMemory());
                     }
                     catch (Exception ex)
                     {
                         failedFiles.Add($"{file.FileName}: {ex.Message}");
                     }
 
-                    // 每转完一个文件回收内存
+                    // 再次回收（确保转换完成后所有对象已释放）
                     ReleaseMemory();
                 }
             }
