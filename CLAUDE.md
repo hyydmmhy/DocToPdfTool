@@ -19,17 +19,18 @@ dotnet build -c Release
 
 ## Project Architecture
 
-**A WPF multi-function document conversion tool** targeting .NET Framework 4.8, with left-side navigation switching between four tools: Doc→PDF, PDF→Word, PDF→Excel, and PDF→Image.
+**A WPF multi-function document conversion tool** targeting .NET Framework 4.8, with left-side navigation switching between five tools: Doc→PDF, PDF→Word, PDF→Excel, PDF→PPT, and PDF→Image.
 
 ### UI Layout
 
 ```
 MainWindow (800x500)
 └─ DockPanel
-    ├─ Left sidebar (180px) — NavListBox with 4 items
+    ├─ Left sidebar (180px) — NavListBox with 5 items
     │   ├─ "文档转PDF" → Pages.DocToPdfPage
     │   ├─ "PDF转Word" → Pages.PdfToWordPage
     │   ├─ "PDF转Excel" → Pages.PdfToExcelPage
+    │   ├─ "PDF转PPT" → Pages.PdfToPptPage
     │   └─ "PDF转图片" → Pages.PdfToImagePage
     ├─ Top-right — "置顶" toggle button
     └─ ContentControl — switches between page UserControls (cached)
@@ -48,6 +49,8 @@ Pages are created once and cached in a `Dictionary<string, UserControl>`. Switch
 - **Pages/PdfToExcelPage.xaml/cs** — PDF→Excel tool. File list with add/remove/drag-drop, convert button. Uses `PdfToExcelConverter` on a background thread.
 
 - **Pages/PdfToImagePage.xaml/cs** — PDF→Image tool. Batch file list with drag-drop, settings (scale/format/DPI), convert button. Uses `Task.Run` with `PdfToImageConverter`.
+
+- **Pages/PdfToPptPage.xaml/cs** — PDF→PPT tool. Batch file list with drag-drop, convert button. Uses `Task.Run` with `PdfToPptConverter`.
 
 - **Utils/PdfConverter.cs** — WPS Office engine (KWps, KET, KWPP COM). Edge headless HTML→PDF.
 
@@ -72,6 +75,13 @@ Pages are created once and cached in a `Dictionary<string, UserControl>`. Switch
   - Header/footer margin filtering to exclude page noise
   - Non-table fallback: outputs text lines as single-column rows when no table structure is detected
   - Pure XML xlsx writer: generates `.xlsx` via `System.IO.Compression.ZipArchive` + `XElement`, zero Office dependency
+
+- **Utils/PdfToPptConverter.cs** — PDF→PPT engine based on Windows.Data.Pdf (Windows 10+ built-in PDF renderer). Key features:
+  - Renders each PDF page as a high-DPI image and embeds it into PPTX slides
+  - Generates valid OOXML with `p:defaultTextStyle`, `p:txStyles`, `p:clrMapOvr` for PowerPoint compatibility
+  - No Office or WPS dependency — pure XML pptx generation via `ZipArchive` + `XElement`
+  - Shares `PdfToImageConverter.ConvertAsync` with per-page `onPageComplete` callback for memory cleanup
+  - DPI (300), scale (1.5×) — fixed high-quality settings
 
 ### Conversion Flow: PDF → Image
 
@@ -111,6 +121,25 @@ PdfToExcelPage.BtnConvert_Click
                  └─ ZipArchive (xlsx) → XElement sheet XML → WriteXmlEntry
 ```
 
+### Conversion Flow: PDF → PPT
+
+```
+PdfToPptPage.BtnConvert_Click
+  └─ await Task.Run
+       └─ PdfToPptConverter.Convert(pdfPath, outputDir, onPageComplete)
+            ├─ PdfToImageConverter.ConvertAsync(pdfPath, tempDir, onPageComplete)
+            │    └─ (per page) → onPageComplete?.Invoke() → ReleaseMemory()
+            └─ RenderAllPages(pdfPath, outputDir, pageCount, onPageComplete)
+                 └─ For each page image:
+                      ├─ CreateSlide(pptPart, imagePath, rels)
+                      │    └─ ZipArchive → ppt/slides/slideN.xml, _rels/slideN.xml.rels
+                      └─ onPageComplete?.Invoke() → ReleaseMemory()
+            └─ WritePresentation(pptPart) → p:defaultTextStyle (9 levels)
+            └─ WriteSlideMaster(masterPart) → p:txStyles (title/body/other)
+            └─ WriteSlideLayout(layoutPart) → p:clrMapOvr with masterClrMapping
+            └─ WriteContentTypes / WriteRels → OOXML boilerplate
+```
+
 ### Important Technical Details
 
 - **Late-bound COM** — all Office/WPS interop uses `Type.GetTypeFromProgID` + `Activator.CreateInstance` with `dynamic`. No primary interop assemblies (PIAs) needed.
@@ -118,9 +147,9 @@ PdfToExcelPage.BtnConvert_Click
 - **PowerPoint on STA thread** — `OfficePdfConverter.ConvertPpt` runs on a dedicated STA thread with 120s timeout; errors are marshaled back via `threadError`.
 - **Edge HTML conversion** — injects `@page { size: 1920px 1080px }` CSS, replaces `position:fixed/sticky` with `static`, then launches `msedge.exe --headless=new` with 60s timeout. Waits up to 6s for PDF file to stabilize after process exit.
 - **WinRT RCW cleanup** — `PdfToImageConverter` explicitly releases all WinRT objects (`PdfDocument`, `PdfPage`, `PdfPageRenderOptions`, `StorageFile`) via `Marshal.FinalReleaseComObject` in `finally` blocks to prevent memory leaks and process hang.
-- **ReleaseMemory()** — `PdfToImagePage` calls a comprehensive cleanup after conversion: `GCSettings.LargeObjectHeapCompactionMode = CompactOnce`, double `GC.Collect()`, and `EmptyWorkingSet()` to return freed pages to the OS.
+- **ReleaseMemory()** — `PdfToImagePage`, `PdfToPptPage`, and `PdfToExcelPage` all call a comprehensive cleanup after conversion: `GCSettings.LargeObjectHeapCompactionMode = CompactOnce`, double `GC.Collect()`, and `EmptyWorkingSet()` to return freed pages to the OS.
 - **PdfPig text extraction** — `PdfToExcelConverter` uses `UglyToad.PdfPig` for PDF text extraction. No COM or native PDF library needed. Words are clustered into rows by Y-coordinate with adaptive tolerance, then columns detected by left-edge alignment clustering.
-- **Xlsx writer** — `PdfToExcelConverter.WriteToExcel` generates a valid `.xlsx` file using only `System.IO.Compression.ZipArchive` and `System.Xml.Linq.XElement`. Creates `[Content_Types].xml`, `_rels/.rels`, `xl/workbook.xml`, `xl/_rels/workbook.xml.rels`, and per-sheet XML files. Uses `inlineStr` cell type (no shared string table needed).
+- **Pptx writer** — `PdfToPptConverter` generates a valid `.pptx` file using only `System.IO.Compression.ZipArchive` and `System.Xml.Linq.XElement`. Creates `[Content_Types].xml`, `_rels/.rels`, `ppt/presentation.xml`, `ppt/slideMasters/slideMaster1.xml`, `ppt/slideLayouts/slideLayout1.xml`, `ppt/slides/slideN.xml`, `ppt/_rels/presentation.xml.rels`, and per-slide rels files. Uses `p:blipFill` with `a:blip` to embed PNG images. Adds `p:defaultTextStyle` (9 levels lvl1pPr-lvl9pPr), `p:txStyles` (titleStyle/bodyStyle/otherStyle), and `p:clrMapOvr` with `masterClrMapping` for full PowerPoint compatibility.
 - **Process exit guarantee** — `App.xaml.cs` hooks `MainWindow.Closed` to call `Process.Kill()` as a safety net, ensuring the process terminates even if WinRT runtime threads linger.
 - **Single-file publish** — conditionally includes `Costura.Fody` only when `SingleFile=true` MSBuild property is set.
 
@@ -131,5 +160,6 @@ PdfToExcelPage.BtnConvert_Click
 - **Doc to PDF requires installed Office** — either WPS Office or Microsoft Office must be installed on the target machine.
 - **PDF to Word requires Microsoft Office** — Word COM automation is required; WPS Office is not supported.
 - **PDF to Excel needs no Office** — uses PdfPig (open-source) for PDF parsing and pure XML for xlsx generation. No Office or COM dependency.
+- **PDF to PPT needs no Office** — uses Windows built-in PDF renderer for images and pure XML for pptx generation. No Office or COM dependency.
 - **PDF to Image needs no extra software** — uses Windows built-in PDF renderer, zero external dependencies.
 - **x64 msedge.exe** — Edge is found via registry (`SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\msedge.exe`) or well-known install paths.
