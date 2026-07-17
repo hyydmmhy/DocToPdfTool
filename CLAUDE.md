@@ -19,19 +19,20 @@ dotnet build -c Release
 
 ## Project Architecture
 
-**A WPF multi-function document conversion tool** targeting .NET Framework 4.8, with left-side navigation switching between five tools: Doc→PDF, PDF→Word, PDF→Excel, PDF→PPT, and PDF→Image.
+**A WPF multi-function document conversion tool** targeting .NET Framework 4.8, with left-side navigation switching between six tools: Doc→PDF, PDF→Word, PDF→Excel, PDF→PPT, PDF→Image, and PDF→ScannedPdf.
 
 ### UI Layout
 
 ```
 MainWindow (800x500)
 └─ DockPanel
-    ├─ Left sidebar (180px) — NavListBox with 5 items
+    ├─ Left sidebar (180px) — NavListBox with 6 items
     │   ├─ "文档转PDF" → Pages.DocToPdfPage
     │   ├─ "PDF转Word" → Pages.PdfToWordPage
     │   ├─ "PDF转Excel" → Pages.PdfToExcelPage
     │   ├─ "PDF转PPT" → Pages.PdfToPptPage
-    │   └─ "PDF转图片" → Pages.PdfToImagePage
+    │   ├─ "PDF转图片" → Pages.PdfToImagePage
+    │   └─ "PDF转扫描件" → Pages.PdfToScannedPdfPage
     ├─ Top-right — "置顶" toggle button
     └─ ContentControl — switches between page UserControls (cached)
 ```
@@ -51,6 +52,8 @@ Pages are created once and cached in a `Dictionary<string, UserControl>`. Switch
 - **Pages/PdfToImagePage.xaml/cs** — PDF→Image tool. Batch file list with drag-drop, settings (scale/format/DPI), convert button. Uses `Task.Run` with `PdfToImageConverter`.
 
 - **Pages/PdfToPptPage.xaml/cs** — PDF→PPT tool. Batch file list with drag-drop, convert button. Uses `Task.Run` with `PdfToPptConverter`.
+
+- **Pages/PdfToScannedPdfPage.xaml/cs** — PDF→ScannedPdf tool. Batch file list with drag-drop, convert button. Uses `Task.Run` with `PdfToScannedPdfConverter`.
 
 - **Utils/PdfConverter.cs** — WPS Office engine (KWps, KET, KWPP COM). Edge headless HTML→PDF.
 
@@ -82,6 +85,14 @@ Pages are created once and cached in a `Dictionary<string, UserControl>`. Switch
   - No Office or WPS dependency — pure XML pptx generation via `ZipArchive` + `XElement`
   - Shares `PdfToImageConverter.ConvertAsync` with per-page `onPageComplete` callback for memory cleanup
   - DPI (300), scale (1.5×) — fixed high-quality settings
+
+- **Utils/PdfToScannedPdfConverter.cs** — PDF→ScannedPdf engine based on Windows.Data.Pdf (Windows 10+ built-in PDF renderer). Key features:
+  - Renders each PDF page as a JPEG image and embeds it into a new PDF via raw PDF writer
+  - Pure .NET PDF writer: writes valid PDF 1.4 with DCTDecode (JPEG) image streams
+  - Zero external dependencies — no iTextSharp, PDFsharp, or any PDF library needed
+  - Generates Catalog, Pages, Page, Image XObject, and Content Stream objects with xref table
+  - DPI (200), JPEG quality (85) — fixed scanned-document settings
+  - Proper WinRT RCW cleanup via `Marshal.FinalReleaseComObject`
 
 ### Conversion Flow: PDF → Image
 
@@ -140,6 +151,25 @@ PdfToPptPage.BtnConvert_Click
             └─ WriteContentTypes / WriteRels → OOXML boilerplate
 ```
 
+### Conversion Flow: PDF → ScannedPdf
+
+```
+PdfToScannedPdfPage.BtnConvert_Click
+  └─ await Task.Run
+       └─ PdfToScannedPdfConverter.Convert(pdfPath, outputDir)
+            ├─ StorageFile.GetFileFromPathAsync(pdfPath)
+            ├─ PdfDocument.LoadFromFileAsync(file)
+            └─ For each page:
+                 ├─ pdfDoc.GetPage(index)
+                 ├─ page.RenderToStreamAsync(stream, options)
+                 │    └─ DPI=200, DestinationWidth/Height computed from page size
+                 ├─ new Bitmap(stream) → EncodeToJpeg (Quality 85)
+                 └─ WritePdf (raw binary):
+                      ├─ Catalog obj / Pages obj (with Kids refs)
+                      ├─ Page obj → Image XObject (JPEG / DCTDecode) + Content Stream
+                      └─ xref table + trailer
+```
+
 ### Important Technical Details
 
 - **Late-bound COM** — all Office/WPS interop uses `Type.GetTypeFromProgID` + `Activator.CreateInstance` with `dynamic`. No primary interop assemblies (PIAs) needed.
@@ -147,7 +177,7 @@ PdfToPptPage.BtnConvert_Click
 - **PowerPoint on STA thread** — `OfficePdfConverter.ConvertPpt` runs on a dedicated STA thread with 120s timeout; errors are marshaled back via `threadError`.
 - **Edge HTML conversion** — injects `@page { size: 1920px 1080px }` CSS, replaces `position:fixed/sticky` with `static`, then launches `msedge.exe --headless=new` with 60s timeout. Waits up to 6s for PDF file to stabilize after process exit.
 - **WinRT RCW cleanup** — `PdfToImageConverter` explicitly releases all WinRT objects (`PdfDocument`, `PdfPage`, `PdfPageRenderOptions`, `StorageFile`) via `Marshal.FinalReleaseComObject` in `finally` blocks to prevent memory leaks and process hang.
-- **ReleaseMemory()** — `PdfToImagePage`, `PdfToPptPage`, and `PdfToExcelPage` all call a comprehensive cleanup after conversion: `GCSettings.LargeObjectHeapCompactionMode = CompactOnce`, double `GC.Collect()`, and `EmptyWorkingSet()` to return freed pages to the OS.
+- **ReleaseMemory()** — `PdfToImagePage`, `PdfToPptPage`, `PdfToExcelPage`, and `PdfToScannedPdfPage` all call a comprehensive cleanup after conversion: `GCSettings.LargeObjectHeapCompactionMode = CompactOnce`, double `GC.Collect()`, and `EmptyWorkingSet()` to return freed pages to the OS.
 - **PdfPig text extraction** — `PdfToExcelConverter` uses `UglyToad.PdfPig` for PDF text extraction. No COM or native PDF library needed. Words are clustered into rows by Y-coordinate with adaptive tolerance, then columns detected by left-edge alignment clustering.
 - **Pptx writer** — `PdfToPptConverter` generates a valid `.pptx` file using only `System.IO.Compression.ZipArchive` and `System.Xml.Linq.XElement`. Creates `[Content_Types].xml`, `_rels/.rels`, `ppt/presentation.xml`, `ppt/slideMasters/slideMaster1.xml`, `ppt/slideLayouts/slideLayout1.xml`, `ppt/slides/slideN.xml`, `ppt/_rels/presentation.xml.rels`, and per-slide rels files. Uses `p:blipFill` with `a:blip` to embed PNG images. Adds `p:defaultTextStyle` (9 levels lvl1pPr-lvl9pPr), `p:txStyles` (titleStyle/bodyStyle/otherStyle), and `p:clrMapOvr` with `masterClrMapping` for full PowerPoint compatibility.
 - **Process exit guarantee** — `App.xaml.cs` hooks `MainWindow.Closed` to call `Process.Kill()` as a safety net, ensuring the process terminates even if WinRT runtime threads linger.
@@ -162,4 +192,5 @@ PdfToPptPage.BtnConvert_Click
 - **PDF to Excel needs no Office** — uses PdfPig (open-source) for PDF parsing and pure XML for xlsx generation. No Office or COM dependency.
 - **PDF to PPT needs no Office** — uses Windows built-in PDF renderer for images and pure XML for pptx generation. No Office or COM dependency.
 - **PDF to Image needs no extra software** — uses Windows built-in PDF renderer, zero external dependencies.
+- **PDF to ScannedPdf needs no extra software** — uses Windows built-in PDF renderer plus raw PDF writer, zero external dependencies.
 - **x64 msedge.exe** — Edge is found via registry (`SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\msedge.exe`) or well-known install paths.

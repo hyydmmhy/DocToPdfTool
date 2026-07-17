@@ -1,6 +1,8 @@
 # DocToPdfTool
 
-多功能文档格式转换工具，支持 **文档转 PDF**、**PDF 转 Word**、**PDF 转 Excel**、**PDF 转 PPT** 和 **PDF 转图片** 等多种转换功能。
+多功能文档格式转换工具，支持 **文档转 PDF**、**PDF 转 Word**、**PDF 转 Excel**、**PDF 转 PPT**、**PDF 转图片** 和 **PDF 转扫描件** 等多种转换功能。
+
+![DocToPdfTool](icons/DocToPdfTool.png)
 
 ## 功能
 
@@ -41,6 +43,13 @@
 - **可调参数**：支持 DPI（150/300/600）、缩放倍率（1×~5×）、输出格式（JPG/PNG）
 - **零依赖**：不依赖 pdfium.dll、Ghostscript 或 Office 组件
 
+### PDF 转扫描件
+- **Windows 内置引擎**：基于 Windows 10/11 内置 PDF 渲染引擎（`Windows.Data.Pdf`），无需额外安装软件
+- **图片型 PDF**：将 PDF 每页渲染为图片后嵌入新 PDF，文字不可选取编辑
+- **批量转换**：支持同时添加多个 PDF 文件，每个文件生成独立扫描件 PDF
+- **拖拽添加**：支持拖拽 PDF 文件到列表
+- **零依赖**：纯 .NET 写入 PDF，无需 pdfium.dll、Ghostscript 或 Office 组件
+
 ## 使用
 
 ### 文档转 PDF
@@ -75,6 +84,12 @@
 4. 点击「转换为图片」
 5. 转换完成后自动打开输出目录（桌面/PDF转图片输出）
 
+### PDF 转扫描件
+1. 点击左侧「PDF转扫描件」切换到 PDF 转扫描件界面
+2. 点击「添加PDF文件」或拖拽 PDF 文件到列表
+3. 点击「转换为扫描件」
+4. 转换完成后自动打开输出目录（桌面/PDF转扫描件输出）
+
 ## 构建
 
 ### Release 构建
@@ -99,8 +114,9 @@ publish_single.bat
 - 纯 XML xlsx 生成（`ZipArchive` + `XElement`，零 Office 依赖）
 - Win32 API 窗口守卫（抑制 Office 弹窗）
 - WMI 进程监控 + WinEventHook（Word 窗口自动隐藏）
-- Windows.Data.Pdf 内置 PDF 渲染引擎（PDF 转图片/PPT，Windows 10+）
+- Windows.Data.Pdf 内置 PDF 渲染引擎（PDF 转图片/PPT/扫描件，Windows 10+）
 - 纯 XML pptx 生成（`ZipArchive` + `XElement`，图片嵌入幻灯片，零 Office 依赖）
+- 纯 .NET PDF 写入（`BinaryWriter` + PDF 规范，零依赖嵌入 JPEG 图片）
 - Costura.Fody（单文件打包）
 
 ## 致谢
