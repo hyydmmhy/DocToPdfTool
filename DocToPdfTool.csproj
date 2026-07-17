@@ -7,7 +7,7 @@
     <LangVersion>latest</LangVersion>
     <RootNamespace>DocToPdfTool</RootNamespace>
     <AssemblyName>DocToPdfTool</AssemblyName>
-    <Version>1.0.0.5</Version>
+    <Version>1.0.0.6</Version>
     <AssemblyTitle>DocToPdfTool</AssemblyTitle>
     <Description>多功能文档格式转换工具，支持文档转PDF（WPS/Office双引擎+HTML转PDF）、PDF转Word、PDF转Excel、PDF转PPT、PDF转图片</Description>
     <Company></Company>
