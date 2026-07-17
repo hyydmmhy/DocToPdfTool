@@ -14,6 +14,7 @@ namespace DocToPdfTool
         private static EventWaitHandle _eventWaitHandle;
         private static bool _shutdownRequested;
         private Thread _waitThread;
+        private int _lastIdleGcTick;
 
         [DllImport("user32.dll")]
         private static extern bool SetForegroundWindow(IntPtr hWnd);
@@ -86,7 +87,7 @@ namespace DocToPdfTool
                     try
                     {
                         // WaitOne 返回 true 表示收到了激活信号，false 是超时
-                        bool signaled = _eventWaitHandle.WaitOne(1000);
+                        bool signaled = _eventWaitHandle.WaitOne(5000);
                         if (_shutdownRequested || !signaled) continue;
 
                         Current.Dispatcher.BeginInvoke((Action)(() =>
@@ -118,6 +119,9 @@ namespace DocToPdfTool
             { IsBackground = true };
             _waitThread.Start();
 
+            // 空闲时 GC：UI 线程无消息时自动回收，防止内存缓慢上涨
+            ComponentDispatcher.ThreadIdle += OnThreadIdle;
+
             var mainWindow = new MainWindow();
             mainWindow.Closed += (s, e) =>
             {
@@ -131,6 +135,21 @@ namespace DocToPdfTool
                 catch { }
             };
             mainWindow.Show();
+        }
+
+        /// <summary>
+        /// UI 线程空闲时 GC，每 30 秒触发一次，防止内存缓慢上涨
+        /// </summary>
+        private void OnThreadIdle(object sender, EventArgs e)
+        {
+            int now = Environment.TickCount;
+            if (now - _lastIdleGcTick >= 30_000)
+            {
+                _lastIdleGcTick = now;
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                GC.Collect();
+            }
         }
     }
 }
