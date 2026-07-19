@@ -8,6 +8,7 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <!-- 工具栏 -->
@@ -70,15 +71,24 @@
                        Foreground="#BBBBBB" FontSize="14"/>
         </Border>
 
+        <!-- 转换引擎 -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,8,0,4">
+            <TextBlock Text="转换引擎:" VerticalAlignment="Center" Foreground="#888888" FontSize="12"/>
+            <RadioButton x:Name="RadioOffice" GroupName="EngineGroup" Content="Microsoft Office" IsChecked="True"
+                         Margin="8,0,16,0" VerticalAlignment="Center"/>
+            <RadioButton x:Name="RadioSpire" GroupName="EngineGroup" Content="内置引擎(Spire)"
+                         VerticalAlignment="Center"/>
+        </StackPanel>
+
         <!-- 转换按钮 -->
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,16,0,8">
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,8,0,8">
             <Button x:Name="BtnConvert" Content="转换为 Word"
                     Padding="24,8" Width="160"
                     Click="BtnConvert_Click"/>
         </StackPanel>
 
         <!-- 状态提示 -->
-        <TextBlock Grid.Row="3" x:Name="TxtConversionStatus"
+        <TextBlock Grid.Row="4" x:Name="TxtConversionStatus"
                    Foreground="#999999" FontSize="12"
                    HorizontalAlignment="Center"
                    Margin="0,4,0,0" Text=""/>

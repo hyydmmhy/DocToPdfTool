@@ -144,37 +144,18 @@ namespace DocToPdfTool.Pages
                 Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
                 "PDF转Word输出");
 
+            bool useSpire = false;
+            Dispatcher.Invoke(() => { useSpire = RadioSpire.IsChecked == true; });
+
             var failedFiles = new List<string>();
 
-            using (var converter = new PdfToWordConverter())
+            if (useSpire)
             {
-                converter.Initialize();
-
-                int total = files.Count;
-                int completed = 0;
-
-                foreach (var file in files)
-                {
-                    completed++;
-
-                    Dispatcher.Invoke(() =>
-                    {
-                        TxtConversionStatus.Text = $"正在转换 ({completed}/{total}) {file.FileName}";
-                    });
-
-                    string outputDir = defaultOutputDir;
-                    if (!Directory.Exists(outputDir))
-                        Directory.CreateDirectory(outputDir);
-
-                    try
-                    {
-                        converter.Convert(file.FilePath, outputDir);
-                    }
-                    catch (Exception ex)
-                    {
-                        failedFiles.Add($"{file.FileName}: {ex.Message}");
-                    }
-                }
+                DoConversionSpire(files, defaultOutputDir, failedFiles);
+            }
+            else
+            {
+                DoConversionOffice(files, defaultOutputDir, failedFiles);
             }
 
             Dispatcher.Invoke(() =>
@@ -191,6 +172,70 @@ namespace DocToPdfTool.Pages
                     try { System.Diagnostics.Process.Start(defaultOutputDir); } catch { }
                 }
             });
+        }
+
+        private void DoConversionOffice(List<PdfFileItem> files, string outputDir, List<string> failedFiles)
+        {
+            using (var converter = new PdfToWordConverter())
+            {
+                converter.Initialize();
+
+                int total = files.Count;
+                int completed = 0;
+
+                foreach (var file in files)
+                {
+                    completed++;
+
+                    Dispatcher.Invoke(() =>
+                    {
+                        TxtConversionStatus.Text = $"正在转换 ({completed}/{total}) {file.FileName}";
+                    });
+
+                    if (!Directory.Exists(outputDir))
+                        Directory.CreateDirectory(outputDir);
+
+                    try
+                    {
+                        converter.Convert(file.FilePath, outputDir);
+                    }
+                    catch (Exception ex)
+                    {
+                        failedFiles.Add($"{file.FileName}: {ex.Message}");
+                    }
+                }
+            }
+        }
+
+        private void DoConversionSpire(List<PdfFileItem> files, string outputDir, List<string> failedFiles)
+        {
+            int total = files.Count;
+            int completed = 0;
+
+            foreach (var file in files)
+            {
+                completed++;
+
+                Dispatcher.Invoke(() =>
+                {
+                    TxtConversionStatus.Text = $"正在转换 ({completed}/{total}) {file.FileName}";
+                });
+
+                if (!Directory.Exists(outputDir))
+                    Directory.CreateDirectory(outputDir);
+
+                try
+                {
+                    using (var converter = new PdfToWordConverterSpire())
+                    {
+                        converter.Convert(file.FilePath, outputDir);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    failedFiles.Add($"{file.FileName}: {ex.Message}");
+                }
+            }
         }
 
         private void AddFiles(IEnumerable<string> filePaths)
