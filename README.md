@@ -13,10 +13,11 @@
 - **Excel 多工作表**：自动列宽适配、分页控制，完整转换所有工作表
 
 ### PDF 转 Word
-- **Microsoft Word 引擎**：基于 Word COM 自动化，将 PDF 转换为 .docx 格式
+- **双引擎转换**：支持 Microsoft Office 和内置引擎（Spire.PDF）两种转换引擎，运行时自由切换
+- **内置引擎无需 Office**：基于 Spire.PDF 免费版，无需安装 Microsoft Office，自动去除评估水印
+- **Microsoft Office 引擎**：基于 Word COM 自动化，质量高但需要安装 Office
 - **批量转换**：支持同时添加多个 PDF 文件，逐个转换
 - **拖拽添加**：支持拖拽 PDF 文件到列表
-- **自动窗口隐藏**：后台静默运行 Word，自动隐藏 Word 窗口
 
 ### PDF 转 Excel
 - **PdfPig 解析引擎**：基于 PdfPig 开源 PDF 文本提取库，不依赖 Office 组件
@@ -62,8 +63,11 @@
 ### PDF 转 Word
 1. 点击左侧「PDF转Word」切换到 PDF 转 Word 界面
 2. 点击「添加PDF文件」或拖拽 PDF 文件到列表
-3. 点击「转换为 Word」
-4. 转换完成后自动打开输出目录（桌面/PDF转Word输出）
+3. 选择转换引擎（内置引擎(Spire) / Microsoft Office）
+4. 点击「转换为 Word」
+5. 转换完成后自动打开输出目录（桌面/PDF转Word输出）
+
+> 内置引擎(Spire) 无需安装 Office，转换质量优秀；Microsoft Office 引擎需要安装 Office。
 
 ### PDF 转 Excel
 1. 点击左侧「PDF转Excel」切换到 PDF 转 Excel 界面
@@ -97,6 +101,13 @@
 dotnet build -c Release
 ```
 
+### 单目录发布
+```bash
+publish_dir.bat
+```
+
+输出在 `publish\DirPublish\`（exe + 所有依赖 DLL）
+
 ### 单文件发布
 ```bash
 publish_single.bat
@@ -109,6 +120,8 @@ publish_single.bat
 - .NET Framework 4.8 / WPF
 - COM 自动化（WPS / Office 后期绑定）
 - Edge Chromium headless（HTML 转 PDF）
+- **Spire.PDF 免费版**（PDF 转 Word 内置引擎，无需 Office，自动去水印）
+- **DocumentFormat.OpenXml**（去水印 / DOCX 操作）
 - Word COM 自动化（PDF 转 Word，3 层回退创建真实 Word 实例）
 - PdfPig 开源 PDF 文本提取（PDF 转 Excel，无需 Office 组件）
 - 纯 XML xlsx 生成（`ZipArchive` + `XElement`，零 Office 依赖）

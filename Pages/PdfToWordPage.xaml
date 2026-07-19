@@ -74,9 +74,9 @@
         <!-- 转换引擎 -->
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,8,0,4">
             <TextBlock Text="转换引擎:" VerticalAlignment="Center" Foreground="#888888" FontSize="12"/>
-            <RadioButton x:Name="RadioOffice" GroupName="EngineGroup" Content="Microsoft Office" IsChecked="True"
+            <RadioButton x:Name="RadioOffice" GroupName="EngineGroup" Content="Microsoft Office"
                          Margin="8,0,16,0" VerticalAlignment="Center"/>
-            <RadioButton x:Name="RadioSpire" GroupName="EngineGroup" Content="内置引擎(Spire)"
+            <RadioButton x:Name="RadioSpire" GroupName="EngineGroup" Content="内置引擎(Spire)" IsChecked="True"
                          VerticalAlignment="Center"/>
         </StackPanel>
 
