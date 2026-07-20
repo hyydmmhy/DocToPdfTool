@@ -14,7 +14,8 @@
 
 ### PDF 转 Word
 - **双引擎转换**：支持 Microsoft Office 和内置引擎（Spire.PDF）两种转换引擎，运行时自由切换
-- **内置引擎无需 Office**：基于 Spire.PDF 免费版，无需安装 Microsoft Office，自动去除评估水印
+- **内置引擎无需 Office**：基于 Spire.PDF，无需安装 Microsoft Office，无页数限制，无水印
+- **大文件分批处理**：超过 20 页的 PDF 自动分批转换后合并，内存峰值可控
 - **Microsoft Office 引擎**：基于 Word COM 自动化，质量高但需要安装 Office
 - **批量转换**：支持同时添加多个 PDF 文件，逐个转换
 - **拖拽添加**：支持拖拽 PDF 文件到列表
@@ -120,8 +121,8 @@ publish_single.bat
 - .NET Framework 4.8 / WPF
 - COM 自动化（WPS / Office 后期绑定）
 - Edge Chromium headless（HTML 转 PDF）
-- **Spire.PDF 免费版**（PDF 转 Word 内置引擎，无需 Office，自动去水印）
-- **DocumentFormat.OpenXml**（去水印 / DOCX 操作）
+- **Spire.PDF**（PDF 转 Word 内置引擎，本地 DLL 引用，无需 Office）
+- **DocumentFormat.OpenXml**（DOCX 合并 / 去水印）
 - Word COM 自动化（PDF 转 Word，3 层回退创建真实 Word 实例）
 - PdfPig 开源 PDF 文本提取（PDF 转 Excel，无需 Office 组件）
 - 纯 XML xlsx 生成（`ZipArchive` + `XElement`，零 Office 依赖）

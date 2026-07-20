@@ -45,7 +45,7 @@ Pages are created once and cached in a `Dictionary<string, UserControl>`. Switch
 
 - **Pages/DocToPdfPage.xaml/cs** — Doc→PDF tool. WPS/Microsoft Office dual engine, Edge HTML converter. Unchanged logic, only `BtnExit_Click` adapted to `Window.GetWindow(this).Close()`.
 
-- **Pages/PdfToWordPage.xaml/cs** — PDF→Word tool. File list (add/remove/drag-drop), progress bar, convert button. Runs Word COM on a dedicated STA thread.
+- **Pages/PdfToWordPage.xaml/cs** — PDF→Word tool. File list (add/remove/drag-drop), progress bar, convert button. Runs Word COM on a dedicated STA thread. Calls `ReleaseMemory()` after conversion (same pattern as other pages).
 
 - **Pages/PdfToExcelPage.xaml/cs** — PDF→Excel tool. File list with add/remove/drag-drop, convert button. Uses `PdfToExcelConverter` on a background thread.
 
@@ -64,6 +64,12 @@ Pages are created once and cached in a `Dictionary<string, UserControl>`. Switch
   - Multi-layer window guard (WMI + WinEventHook + 80ms polling)
   - Registers `DisableConvertPDFWarning` in HKCU
   - Removes Mark-of-the-Web Zone.Identifier before opening
+
+- **Utils/PdfToWordConverterSpire.cs** — Spire.PDF PDF→Word engine (no Office needed). Key features:
+  - Uses local `Libs\Spire.Pdf.dll` reference (cracked, no page limit or watermark)
+  - Large PDF batch processing: splits into 20-page batches, converts each batch, merges DOCX via OpenXML AltChunk
+  - Memory-controlled: `ReleaseMemory()` after each batch (`GC.Collect` + `EmptyWorkingSet`)
+  - Page count via PdfPig (lightweight, no memory spike from initial load)
 
 - **Utils/PdfToImageConverter.cs** — PDF→Image engine based on Windows.Data.Pdf (Windows 10+ built-in PDF renderer). Key features:
   - Zero external dependencies (no pdfium.dll, Ghostscript, or Office required)
@@ -177,7 +183,7 @@ PdfToScannedPdfPage.BtnConvert_Click
 - **PowerPoint on STA thread** — `OfficePdfConverter.ConvertPpt` runs on a dedicated STA thread with 120s timeout; errors are marshaled back via `threadError`.
 - **Edge HTML conversion** — injects `@page { size: 1920px 1080px }` CSS, replaces `position:fixed/sticky` with `static`, then launches `msedge.exe --headless=new` with 60s timeout. Waits up to 6s for PDF file to stabilize after process exit.
 - **WinRT RCW cleanup** — `PdfToImageConverter` explicitly releases all WinRT objects (`PdfDocument`, `PdfPage`, `PdfPageRenderOptions`, `StorageFile`) via `Marshal.FinalReleaseComObject` in `finally` blocks to prevent memory leaks and process hang.
-- **ReleaseMemory()** — `PdfToImagePage`, `PdfToPptPage`, `PdfToExcelPage`, and `PdfToScannedPdfPage` all call a comprehensive cleanup after conversion: `GCSettings.LargeObjectHeapCompactionMode = CompactOnce`, double `GC.Collect()`, and `EmptyWorkingSet()` to return freed pages to the OS.
+- **ReleaseMemory()** — `PdfToImagePage`, `PdfToPptPage`, `PdfToExcelPage`, `PdfToScannedPdfPage`, and `PdfToWordPage` all call a comprehensive cleanup after conversion: `GCSettings.LargeObjectHeapCompactionMode = CompactOnce`, double `GC.Collect()`, and `EmptyWorkingSet()` to return freed pages to the OS. `PdfToWordConverterSpire` also calls this internally after each batch.
 - **PdfPig text extraction** — `PdfToExcelConverter` uses `UglyToad.PdfPig` for PDF text extraction. No COM or native PDF library needed. Words are clustered into rows by Y-coordinate with adaptive tolerance, then columns detected by left-edge alignment clustering.
 - **Pptx writer** — `PdfToPptConverter` generates a valid `.pptx` file using only `System.IO.Compression.ZipArchive` and `System.Xml.Linq.XElement`. Creates `[Content_Types].xml`, `_rels/.rels`, `ppt/presentation.xml`, `ppt/slideMasters/slideMaster1.xml`, `ppt/slideLayouts/slideLayout1.xml`, `ppt/slides/slideN.xml`, `ppt/_rels/presentation.xml.rels`, and per-slide rels files. Uses `p:blipFill` with `a:blip` to embed PNG images. Adds `p:defaultTextStyle` (9 levels lvl1pPr-lvl9pPr), `p:txStyles` (titleStyle/bodyStyle/otherStyle), and `p:clrMapOvr` with `masterClrMapping` for full PowerPoint compatibility.
 - **Process exit guarantee** — `App.xaml.cs` hooks `MainWindow.Closed` to call `Process.Kill()` as a safety net, ensuring the process terminates even if WinRT runtime threads linger.
@@ -188,7 +194,7 @@ PdfToScannedPdfPage.BtnConvert_Click
 - **Windows-only** — targets `net48` (Windows-only), uses Win32 P/Invoke extensively.
 - **PDF to Image requires Windows 10+** — `Windows.Data.Pdf` API is only available on Windows 10/11.
 - **Doc to PDF requires installed Office** — either WPS Office or Microsoft Office must be installed on the target machine.
-- **PDF to Word requires Microsoft Office** — Word COM automation is required; WPS Office is not supported.
+- **PDF to Word** — Spire.PDF engine (local DLL, no Office needed) or Microsoft Office COM automation. Spire engine is the default.
 - **PDF to Excel needs no Office** — uses PdfPig (open-source) for PDF parsing and pure XML for xlsx generation. No Office or COM dependency.
 - **PDF to PPT needs no Office** — uses Windows built-in PDF renderer for images and pure XML for pptx generation. No Office or COM dependency.
 - **PDF to Image needs no extra software** — uses Windows built-in PDF renderer, zero external dependencies.

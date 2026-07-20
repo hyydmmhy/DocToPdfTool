@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -133,10 +135,26 @@ namespace DocToPdfTool.Pages
             {
                 BtnConvert.IsEnabled = true;
                 BtnAddFiles.IsEnabled = true;
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
+                ReleaseMemory();
             }
         }
+
+        private static void ReleaseMemory()
+        {
+            try
+            {
+                System.Runtime.GCSettings.LargeObjectHeapCompactionMode =
+                    System.Runtime.GCLargeObjectHeapCompactionMode.CompactOnce;
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                GC.Collect();
+                EmptyWorkingSet(Process.GetCurrentProcess().Handle);
+            }
+            catch { }
+        }
+
+        [DllImport("psapi.dll")]
+        private static extern bool EmptyWorkingSet(IntPtr hProcess);
 
         private void DoConversion(List<PdfFileItem> files)
         {
