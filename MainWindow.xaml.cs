@@ -32,6 +32,7 @@ namespace DocToPdfTool
                     page = pageKey switch
                     {
                         "DocToPdf" => new Pages.DocToPdfPage(),
+                        "WordToPdf" => new Pages.WordToPdfPage(),
                         "PdfToWord" => new Pages.PdfToWordPage(),
                         "PdfToImage" => new Pages.PdfToImagePage(),
                         "PdfToExcel" => new Pages.PdfToExcelPage(),

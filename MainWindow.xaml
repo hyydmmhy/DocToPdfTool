@@ -18,6 +18,7 @@
                 <ListBox x:Name="NavList" Style="{StaticResource NavListBox}"
                          SelectionChanged="NavList_SelectionChanged">
                     <ListBoxItem Tag="DocToPdf" Content="文档转PDF" FontSize="14"/>
+                    <ListBoxItem Tag="WordToPdf" Content="Word转PDF" FontSize="14"/>
                     <ListBoxItem Tag="PdfToWord" Content="PDF转Word" FontSize="14"/>
                     <ListBoxItem Tag="PdfToImage" Content="PDF转图片" FontSize="14"/>
                     <ListBoxItem Tag="PdfToExcel" Content="PDF转Excel" FontSize="14"/>
