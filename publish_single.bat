@@ -5,9 +5,9 @@ dotnet publish DocToPdfTool.csproj -c Release -o publish\SingleFile -p:SingleFil
 
 if %errorlevel% equ 0 (
     if exist "publish\SingleFile\DocToPdfTool.exe.config" del "publish\SingleFile\DocToPdfTool.exe.config"
-    REM Remove build artifact DLLs — Costura embeds them into the exe
+    REM Remove build artifact DLLs - Costura embeds them into the exe
     if exist "publish\SingleFile\*.dll" del "publish\SingleFile\*.dll"
-    REM Remove XML doc files — not needed at runtime
+    REM Remove XML doc files - not needed at runtime
     if exist "publish\SingleFile\*.xml" del "publish\SingleFile\*.xml"
     echo.
     echo Done! Output: publish\SingleFile\DocToPdfTool.exe
