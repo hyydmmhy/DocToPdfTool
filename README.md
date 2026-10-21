@@ -1,6 +1,6 @@
 # DocToPdfTool
 
-多功能文档格式转换工具，支持 **文档转 PDF**、**PDF 转 Word**、**PDF 转 Excel**、**PDF 转 PPT**、**PDF 转图片** 和 **PDF 转扫描件** 等多种转换功能。
+多功能文档格式转换工具，支持 **文档转 PDF**、**Word 转 PDF**、**PDF 转 Word**、**PDF 转 Excel**、**PDF 转 PPT**、**PDF 转图片**、**PDF 转扫描件**、**拆分 PDF** 和 **合并 PDF** 等多种转换功能。
 
 ![DocToPdfTool](icons/DocToPdfTool.png)
 
@@ -11,6 +11,13 @@
 - **格式支持**：Word（.doc/.docx）、Excel（.xls/.xlsx）、PPT（.ppt/.pptx）、文本（.txt/.rtf）、HTML（.html/.htm/.mhtml）
 - **HTML 转换**：基于 Edge 浏览器 headless 模式，保留原始布局和样式
 - **Excel 多工作表**：自动列宽适配、分页控制，完整转换所有工作表
+- **批量转换**：支持添加/拖拽多个文档，逐文件显示转换进度
+- **拖拽添加**：支持拖拽文档到列表，列表中间显示操作提示
+
+### Word 转 PDF
+- **内置引擎，无需外部依赖**：基于 Spire.Doc 本地 DLL，无需安装 Microsoft Office 或 WPS
+- **批量转换**：支持同时添加多个 Word 文件，逐个转换
+- **拖拽添加**：支持拖拽 Word 文件到列表
 
 ### PDF 转 Word
 - **双引擎转换**：支持 Microsoft Office 和内置引擎（Spire.PDF）两种转换引擎，运行时自由切换
@@ -52,48 +59,48 @@
 - **拖拽添加**：支持拖拽 PDF 文件到列表
 - **零依赖**：纯 .NET 写入 PDF，无需 pdfium.dll、Ghostscript 或 Office 组件
 
+### 拆分 PDF
+- **按页数拆分**：每 N 页拆分为一个文件（默认每 1 页）
+- **按范围拆分**：自定义页码范围，支持单页与范围混合，如 `1-5,6,7-8`
+- **页数预览**：添加文件后自动显示每个 PDF 的页数，方便填写拆分参数
+- **零依赖**：基于 PdfPig 的 PdfDocumentBuilder 逐页复制，保留原始文字、矢量和图片，不会栅格化
+- **批量拆分**：支持同时添加多个 PDF 文件
+
+### 合并 PDF
+- **顺序合并**：列表顺序即合并顺序，支持「上移 / 下移」调整文件次序
+- **页数预览**：添加文件后自动显示每个 PDF 的页数
+- **防覆盖**：输出文件与已有文件重名时自动追加序号
+- **零依赖**：基于 PdfPig 的 PdfDocumentBuilder 逐页复制，保留原始质量，不会栅格化
+
+## 设置
+
+- 点击右上角 **「≡ 设置」** 按钮打开设置窗口
+- 可查看和修改**默认保存目录**（未配置时默认取系统「下载」目录）
+- 设置保存在 `%APPDATA%\DocToPdfTool\config.ini`，永久生效
+
+所有转换结果默认输出到「下载目录」，并按功能名自动创建子目录存放（目录存在则不重复创建）：
+
+| 功能 | 输出子目录 |
+|------|-----------|
+| 文档转 PDF | `下载目录\文档转PDF\` |
+| Word 转 PDF | `下载目录\Word转PDF\` |
+| PDF 转 Word | `下载目录\PDF转Word\` |
+| PDF 转 Excel | `下载目录\PDF转Excel\` |
+| PDF 转 PPT | `下载目录\PDF转PPT\` |
+| PDF 转图片 | `下载目录\PDF转图片\` |
+| PDF 转扫描件 | `下载目录\PDF转扫描件\` |
+| 拆分 PDF | `下载目录\拆分PDF\` |
+| 合并 PDF | `下载目录\合并PDF\` |
+
 ## 使用
 
-### 文档转 PDF
-1. 选择源文件（支持多格式筛选）
-2. 设置输出目录（默认与源文件同目录）
-3. 选择转换引擎（WPS Office / Microsoft Office）
+1. 点击左侧功能菜单切换到对应界面
+2. 点击「添加文件」按钮或直接拖拽文件到列表
+3. 按需求选择转换引擎 / 拆分方式 / 图片参数
 4. 点击「执行转换」
-5. 转换成功后自动打开输出目录
+5. 转换完成后自动打开输出目录
 
-### PDF 转 Word
-1. 点击左侧「PDF转Word」切换到 PDF 转 Word 界面
-2. 点击「添加PDF文件」或拖拽 PDF 文件到列表
-3. 选择转换引擎（内置引擎(Spire) / Microsoft Office）
-4. 点击「转换为 Word」
-5. 转换完成后自动打开输出目录（桌面/PDF转Word输出）
-
-> 内置引擎(Spire) 无需安装 Office，转换质量优秀；Microsoft Office 引擎需要安装 Office。
-
-### PDF 转 Excel
-1. 点击左侧「PDF转Excel」切换到 PDF 转 Excel 界面
-2. 点击「添加PDF文件」或拖拽 PDF 文件到列表
-3. 点击「转换为 Excel」
-4. 转换完成后自动打开输出目录（桌面/PDF转Excel输出）
-
-### PDF 转 PPT
-1. 点击左侧「PDF转PPT」切换到 PDF 转 PPT 界面
-2. 点击「添加PDF文件」或拖拽 PDF 文件到列表
-3. 点击「转换为 PPT」
-4. 转换完成后自动打开输出目录（桌面/PDF转PPT输出）
-
-### PDF 转图片
-1. 点击左侧「PDF转图片」切换到 PDF 转图片界面
-2. 点击「添加PDF文件」或拖拽 PDF 文件到列表
-3. 设置缩放倍率、输出格式、DPI（可选，默认值即可获得清晰图片）
-4. 点击「转换为图片」
-5. 转换完成后自动打开输出目录（桌面/PDF转图片输出）
-
-### PDF 转扫描件
-1. 点击左侧「PDF转扫描件」切换到 PDF 转扫描件界面
-2. 点击「添加PDF文件」或拖拽 PDF 文件到列表
-3. 点击「转换为扫描件」
-4. 转换完成后自动打开输出目录（桌面/PDF转扫描件输出）
+> 输出目录可在设置窗口中修改默认保存目录后生效，各功能的子目录会自动创建。
 
 ## 构建
 
@@ -122,15 +129,17 @@ publish_single.bat
 - COM 自动化（WPS / Office 后期绑定）
 - Edge Chromium headless（HTML 转 PDF）
 - **Spire.PDF**（PDF 转 Word 内置引擎，本地 DLL 引用，无需 Office）
+- **Spire.Doc**（Word 转 PDF 内置引擎，本地 DLL 引用，无需 Office）
 - **DocumentFormat.OpenXml**（DOCX 合并 / 去水印）
 - Word COM 自动化（PDF 转 Word，3 层回退创建真实 Word 实例）
-- PdfPig 开源 PDF 文本提取（PDF 转 Excel，无需 Office 组件）
+- PdfPig 开源 PDF 文本提取（PDF 转 Excel、拆分 PDF（PdfDocumentBuilder）、合并 PDF）
 - 纯 XML xlsx 生成（`ZipArchive` + `XElement`，零 Office 依赖）
 - Win32 API 窗口守卫（抑制 Office 弹窗）
 - WMI 进程监控 + WinEventHook（Word 窗口自动隐藏）
 - Windows.Data.Pdf 内置 PDF 渲染引擎（PDF 转图片/PPT/扫描件，Windows 10+）
 - 纯 XML pptx 生成（`ZipArchive` + `XElement`，图片嵌入幻灯片，零 Office 依赖）
 - 纯 .NET PDF 写入（`BinaryWriter` + PDF 规范，零依赖嵌入 JPEG 图片）
+- ini 配置（`%APPDATA%\DocToPdfTool\config.ini`，默认保存目录持久化）
 - Costura.Fody（单文件打包）
 
 ## 致谢

@@ -6,7 +6,10 @@
             <ListView.View><GridView><GridViewColumn Header="文件名" Width="180" DisplayMemberBinding="{Binding FileName}"/><GridViewColumn Header="路径" Width="320" DisplayMemberBinding="{Binding FilePath}"/><GridViewColumn Header="操作" Width="70"><GridViewColumn.CellTemplate><DataTemplate><Button Content="移除" Padding="8,2" FontSize="12" Tag="{Binding}" Click="BtnRemoveFile_Click"/></DataTemplate></GridViewColumn.CellTemplate></GridViewColumn></GridView></ListView.View>
         </ListView>
         <Border Grid.Row="1" x:Name="EmptyOverlay" Background="White" IsHitTestVisible="False" Visibility="Visible"><TextBlock Text="拖拽Word文件到此处，或点击上方「添加Word文件」按钮" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#BBBBBB" FontSize="14"/></Border>
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,12,0,8"><Button x:Name="BtnConvert" Content="转换为 PDF" Padding="24,8" Width="160" Click="BtnConvert_Click"/></StackPanel>
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,12,0,8">
+            <TextBlock Text="内置转换引擎，无需外部依赖" VerticalAlignment="Center" Foreground="#888888" FontSize="12" Margin="0,0,16,0"/>
+            <Button x:Name="BtnConvert" Content="转换为 PDF" Padding="24,8" Width="160" Click="BtnConvert_Click"/>
+        </StackPanel>
         <TextBlock Grid.Row="3" x:Name="TxtConversionStatus" Foreground="#999999" FontSize="12" HorizontalAlignment="Center" Margin="0,4,0,0" Text=""/>
     </Grid>
 </UserControl>

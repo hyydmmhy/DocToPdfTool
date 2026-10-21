@@ -42,7 +42,7 @@ namespace DocToPdfTool.Pages
         [DllImport("psapi.dll")] private static extern bool EmptyWorkingSet(IntPtr hProcess);
         private void DoConversion(System.Collections.Generic.List<PdfFileItem> files)
         {
-            string dir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "Word转PDF输出");
+            string dir = AppConfig.GetFeatureOutputDir("Word转PDF");
             int t = files.Count; int c = 0; var fails = new System.Collections.Generic.List<string>();
             foreach (var f in files)
             { c++; int i = c; Dispatcher.Invoke(() => TxtConversionStatus.Text = $"正在转换 ({i}/{t}) {f.FileName}");

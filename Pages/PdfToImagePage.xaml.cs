@@ -96,11 +96,7 @@ namespace DocToPdfTool.Pages
             }
 
             // 确定输出目录
-            string defaultOutputDir = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
-                "PDF转图片输出");
-            if (!Directory.Exists(defaultOutputDir))
-                Directory.CreateDirectory(defaultOutputDir);
+            string defaultOutputDir = AppConfig.GetFeatureOutputDir("PDF转图片");
 
             // 读取设置
             double scale = 1.5;

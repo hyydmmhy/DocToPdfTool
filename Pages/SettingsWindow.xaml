@@ -1,0 +1,59 @@
+<Window x:Class="DocToPdfTool.Pages.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="设置"
+        Width="560" Height="340"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False">
+    <DockPanel>
+        <!-- 左侧菜单 -->
+        <Border DockPanel.Dock="Left" Width="160" Background="#FAFAFA"
+                BorderBrush="#E0E0E0" BorderThickness="0,0,1,0">
+            <StackPanel>
+                <Border Padding="16,16,16,12" BorderBrush="#E0E0E0" BorderThickness="0,0,0,1">
+                    <TextBlock Text="设置" Foreground="#888888" FontSize="12"/>
+                </Border>
+                <ListBox Style="{StaticResource NavListBox}" SelectedIndex="0">
+                    <ListBoxItem Content="保存目录" FontSize="14"/>
+                </ListBox>
+            </StackPanel>
+        </Border>
+
+        <!-- 右侧内容 -->
+        <Grid Margin="24,20,24,20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0" Text="默认保存目录" FontSize="15" FontWeight="Bold"/>
+
+            <TextBlock Grid.Row="1" Text="所有转换结果将保存在该目录下按功能命名的子目录中"
+                       Foreground="#999999" FontSize="12" Margin="0,8,0,0" TextWrapping="Wrap"/>
+
+            <Grid Grid.Row="2" Margin="0,16,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBox Grid.Column="0" x:Name="TxtSaveDir" IsReadOnly="True"
+                         VerticalAlignment="Center"/>
+                <Button Grid.Column="1" Content="浏览" Padding="12,4" Margin="8,0,0,0"
+                        Click="BtnBrowseDir_Click"/>
+            </Grid>
+
+            <TextBlock Grid.Row="3" x:Name="TxtStatus"
+                       Foreground="#4CAF50" FontSize="12"
+                       Margin="0,10,0,0" Text=""/>
+
+            <StackPanel Grid.Row="4" Orientation="Horizontal"
+                        HorizontalAlignment="Right" VerticalAlignment="Bottom">
+                <Button Content="关 闭" Padding="20,6" Click="BtnClose_Click"/>
+            </StackPanel>
+        </Grid>
+    </DockPanel>
+</Window>

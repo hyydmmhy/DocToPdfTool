@@ -137,9 +137,7 @@ namespace DocToPdfTool.Pages
 
         private void DoConversion(List<PdfFileItem> files)
         {
-            string defaultOutputDir = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
-                "PDF转Excel输出");
+            string defaultOutputDir = AppConfig.GetFeatureOutputDir("PDF转Excel");
 
             var failedFiles = new List<string>();
 

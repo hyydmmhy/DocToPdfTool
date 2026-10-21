@@ -38,6 +38,8 @@ namespace DocToPdfTool
                         "PdfToExcel" => new Pages.PdfToExcelPage(),
                         "PdfToPpt" => new Pages.PdfToPptPage(),
                         "PdfToScannedPdf" => new Pages.PdfToScannedPdfPage(),
+                        "PdfSplit" => new Pages.PdfSplitPage(),
+                        "PdfMerge" => new Pages.PdfMergePage(),
                         _ => throw new ArgumentException($"Unknown page: {pageKey}")
                     };
                     _pages[pageKey] = page;
@@ -55,6 +57,12 @@ namespace DocToPdfTool
         private void BtnTopmost_Click(object sender, RoutedEventArgs e)
         {
             Topmost = BtnTopmost.IsChecked == true;
+        }
+
+        private void BtnSettings_Click(object sender, RoutedEventArgs e)
+        {
+            var settingsWindow = new Pages.SettingsWindow { Owner = this };
+            settingsWindow.ShowDialog();
         }
     }
 }

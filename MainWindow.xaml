@@ -24,15 +24,24 @@
                     <ListBoxItem Tag="PdfToExcel" Content="PDF转Excel" FontSize="14"/>
                     <ListBoxItem Tag="PdfToPpt" Content="PDF转PPT" FontSize="14"/>
                     <ListBoxItem Tag="PdfToScannedPdf" Content="PDF转扫描件" FontSize="14"/>
+                    <ListBoxItem Tag="PdfSplit" Content="拆分PDF" FontSize="14"/>
+                    <ListBoxItem Tag="PdfMerge" Content="合并PDF" FontSize="14"/>
                 </ListBox>
             </StackPanel>
         </Border>
 
-        <!-- 置顶按钮 -->
-        <ToggleButton x:Name="BtnTopmost" Content="📌 置顶"
-                      DockPanel.Dock="Top" HorizontalAlignment="Right"
-                      Margin="0,8,12,0" Padding="8,2"
-                      Click="BtnTopmost_Click" Style="{StaticResource TopmostToggleButton}"/>
+        <!-- 右上角：设置 + 置顶按钮 -->
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal"
+                    HorizontalAlignment="Right" Margin="0,8,12,0">
+            <Button x:Name="BtnSettings" Content="≡" FontSize="16"
+                    Padding="8,0" Margin="0,0,8,0"
+                    ToolTip="设置"
+                    Click="BtnSettings_Click"
+                    Background="Transparent" BorderBrush="Transparent"/>
+            <ToggleButton x:Name="BtnTopmost" Content="📌 置顶"
+                          Padding="8,2"
+                          Click="BtnTopmost_Click" Style="{StaticResource TopmostToggleButton}"/>
+        </StackPanel>
 
         <!-- 右侧内容区 -->
         <ContentControl x:Name="PageContent" Focusable="False" Margin="0,0,0,0"/>
