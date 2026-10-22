@@ -1,6 +1,6 @@
 # DocToPdfTool
 
-多功能文档格式转换工具，支持 **文档转 PDF**、**Word 转 PDF**、**PDF 转 Word**、**PDF 转 Excel**、**PDF 转 PPT**、**PDF 转图片**、**PDF 转扫描件**、**拆分 PDF** 和 **合并 PDF** 等多种转换功能。
+多功能文档格式转换工具，支持 **文档转 PDF**、**Word 转 PDF**、**Excel 转 PDF**、**PDF 转 Word**、**PDF 转 Excel**、**PDF 转 PPT**、**PDF 转图片**、**PDF 转扫描件**、**拆分 PDF** 和 **合并 PDF** 等多种转换功能。
 
 ![DocToPdfTool](icons/DocToPdfTool.png)
 
@@ -18,6 +18,14 @@
 - **内置引擎，无需外部依赖**：基于 Spire.Doc 本地 DLL，无需安装 Microsoft Office 或 WPS
 - **批量转换**：支持同时添加多个 Word 文件，逐个转换
 - **拖拽添加**：支持拖拽 Word 文件到列表
+
+### Excel 转 PDF
+- **内置引擎，无需外部依赖**：基于 Spire.XLS 本地 DLL，无需安装 Microsoft Office 或 WPS
+- **格式支持**：Excel（.xls/.xlsx）
+- **无水印转换**：通过内部激活信息注入，输出 PDF 无水印、无推广页
+- **内存优化**：转换前跳过公式重算、转换后自动清理引擎缓存，降低批量转换时的内存峰值
+- **批量转换**：支持同时添加多个 Excel 文件，逐个转换
+- **拖拽添加**：支持拖拽 Excel 文件到列表
 
 ### PDF 转 Word
 - **双引擎转换**：支持 Microsoft Office 和内置引擎（Spire.PDF）两种转换引擎，运行时自由切换
@@ -84,6 +92,7 @@
 |------|-----------|
 | 文档转 PDF | `下载目录\文档转PDF\` |
 | Word 转 PDF | `下载目录\Word转PDF\` |
+| Excel 转 PDF | `下载目录\Excel转PDF\` |
 | PDF 转 Word | `下载目录\PDF转Word\` |
 | PDF 转 Excel | `下载目录\PDF转Excel\` |
 | PDF 转 PPT | `下载目录\PDF转PPT\` |
@@ -130,6 +139,7 @@ publish_single.bat
 - Edge Chromium headless（HTML 转 PDF）
 - **Spire.PDF**（PDF 转 Word 内置引擎，本地 DLL 引用，无需 Office）
 - **Spire.Doc**（Word 转 PDF 内置引擎，本地 DLL 引用，无需 Office）
+- **Spire.XLS**（Excel 转 PDF 内置引擎，本地 DLL 引用，无需 Office）
 - **DocumentFormat.OpenXml**（DOCX 合并 / 去水印）
 - Word COM 自动化（PDF 转 Word，3 层回退创建真实 Word 实例）
 - PdfPig 开源 PDF 文本提取（PDF 转 Excel、拆分 PDF（PdfDocumentBuilder）、合并 PDF）

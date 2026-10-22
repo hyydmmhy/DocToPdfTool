@@ -33,6 +33,7 @@ namespace DocToPdfTool
                     {
                         "DocToPdf" => new Pages.DocToPdfPage(),
                         "WordToPdf" => new Pages.WordToPdfPage(),
+                        "ExcelToPdf" => new Pages.ExcelToPdfPage(),
                         "PdfToWord" => new Pages.PdfToWordPage(),
                         "PdfToImage" => new Pages.PdfToImagePage(),
                         "PdfToExcel" => new Pages.PdfToExcelPage(),
