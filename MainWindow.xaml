@@ -11,15 +11,22 @@
         <!-- 左侧导航 -->
         <Border DockPanel.Dock="Left" Width="180" Background="#FAFAFA"
                 BorderBrush="#E0E0E0" BorderThickness="0,0,1,0">
-            <StackPanel>
-                <Border Padding="16,16,16,12" BorderBrush="#E0E0E0" BorderThickness="0,0,0,1">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Border Grid.Row="0" Padding="16,16,16,12" BorderBrush="#E0E0E0" BorderThickness="0,0,0,1">
                     <TextBlock Text="功能导航" Foreground="#888888" FontSize="12"/>
                 </Border>
-                <ListBox x:Name="NavList" Style="{StaticResource NavListBox}"
+                <ListBox Grid.Row="1" x:Name="NavList" Style="{StaticResource NavListBox}"
+                         ScrollViewer.VerticalScrollBarVisibility="Auto"
+                         ScrollViewer.CanContentScroll="True"
                          SelectionChanged="NavList_SelectionChanged">
                     <ListBoxItem Tag="DocToPdf" Content="文档转PDF" FontSize="14"/>
                     <ListBoxItem Tag="WordToPdf" Content="Word转PDF" FontSize="14"/>
                     <ListBoxItem Tag="ExcelToPdf" Content="Excel转PDF" FontSize="14"/>
+                    <ListBoxItem Tag="PptToPdf" Content="PPT转PDF" FontSize="14"/>
                     <ListBoxItem Tag="PdfToWord" Content="PDF转Word" FontSize="14"/>
                     <ListBoxItem Tag="PdfToImage" Content="PDF转图片" FontSize="14"/>
                     <ListBoxItem Tag="PdfToExcel" Content="PDF转Excel" FontSize="14"/>
@@ -28,7 +35,7 @@
                     <ListBoxItem Tag="PdfSplit" Content="拆分PDF" FontSize="14"/>
                     <ListBoxItem Tag="PdfMerge" Content="合并PDF" FontSize="14"/>
                 </ListBox>
-            </StackPanel>
+            </Grid>
         </Border>
 
         <!-- 右上角：设置 + 置顶按钮 -->

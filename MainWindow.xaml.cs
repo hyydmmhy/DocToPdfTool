@@ -38,6 +38,7 @@ namespace DocToPdfTool
                         "PdfToImage" => new Pages.PdfToImagePage(),
                         "PdfToExcel" => new Pages.PdfToExcelPage(),
                         "PdfToPpt" => new Pages.PdfToPptPage(),
+                        "PptToPdf" => new Pages.PptToPdfPage(),
                         "PdfToScannedPdf" => new Pages.PdfToScannedPdfPage(),
                         "PdfSplit" => new Pages.PdfSplitPage(),
                         "PdfMerge" => new Pages.PdfMergePage(),

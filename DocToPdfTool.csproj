@@ -7,7 +7,7 @@
     <LangVersion>latest</LangVersion>
     <RootNamespace>DocToPdfTool</RootNamespace>
     <AssemblyName>DocToPdfTool</AssemblyName>
-    <Version>1.0.0.10</Version>
+    <Version>1.0.0.11</Version>
     <AssemblyTitle>DocToPdfTool</AssemblyTitle>
     <Description>多功能文档格式转换工具，支持文档转PDF（WPS/Office双引擎+HTML转PDF）、Word转PDF、Excel转PDF、PDF转Word（Office/Spire双引擎）、PDF转Excel、PDF转图片、PDF转PPT、PDF转扫描件</Description>
     <Company></Company>
@@ -38,6 +38,10 @@
     </Reference>
     <Reference Include="Spire.XLS">
       <HintPath>Libs\Spire.XLS.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Spire.Presentation">
+      <HintPath>Libs\Spire.Presentation.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <PackageReference Include="DocumentFormat.OpenXml" Version="3.2.0" />
