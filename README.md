@@ -1,8 +1,15 @@
 # DocToPdfTool
 
-多功能文档格式转换工具，支持 **文档转 PDF**、**Word 转 PDF**、**Excel 转 PDF**、**PDF 转 Word**、**PDF 转 Excel**、**PDF 转 PPT**、**PDF 转图片**、**PDF 转扫描件**、**拆分 PDF** 和 **合并 PDF** 等多种转换功能。
+多功能文档格式转换工具，支持 **文档转 PDF**、**Word 转 PDF**、**Excel 转 PDF**、**PPT 转 PDF**、**PPT 转 Word**、**PDF 转 Word**、**PDF 转 Excel**、**PDF 转 PPT**、**PDF 转图片**、**PDF 转扫描件**、**拆分 PDF** 和 **合并 PDF** 等多种转换功能。
 
 ![DocToPdfTool](icons/DocToPdfTool.png)
+
+## 界面
+
+- **首页**：程序启动后展示功能主页，顶部为搜索框（输入关键词即可模糊匹配功能），下方为所有功能按钮网格（水平居中，功能增多时可滚动）
+- **功能页**：点击首页功能按钮或搜索结果后，在同一窗口内切换到「左侧导航 + 右侧功能区」布局，并自动定位左侧菜单选中项（自动滚动到可视区）
+- **返回首页**：功能页左上角提供「🏠 首页」按钮，可随时返回主页
+- **单窗口路由**：首页与功能页之间为同一窗口内的页面切换，不会打开新窗口
 
 ## 功能
 
@@ -26,6 +33,23 @@
 - **内存优化**：转换前跳过公式重算、转换后自动清理引擎缓存，降低批量转换时的内存峰值
 - **批量转换**：支持同时添加多个 Excel 文件，逐个转换
 - **拖拽添加**：支持拖拽 Excel 文件到列表
+
+### PPT 转 PDF
+- **内置引擎，无需外部依赖**：基于 Spire.Presentation 本地 DLL，无需安装 Microsoft Office 或 WPS
+- **格式支持**：PowerPoint（.ppt/.pptx）
+- **无水印、无页数限制**：本地 DLL 已解除评估水印与试用期页数限制，长文档可完整转换
+- **内存优化**：每次转换后强制 GC + 归还内存给操作系统，降低批量转换时的内存峰值
+- **批量转换**：支持同时添加多个 PPT 文件，逐个转换
+- **拖拽添加**：支持拖拽 PPT 文件到列表
+
+### PPT 转 Word
+- **内置引擎，无需外部依赖**：基于本地 DLL（Spire.Presentation + Spire.PDF），无需安装 Microsoft Office 或 WPS
+- **格式支持**：PowerPoint（.ppt/.pptx）→ Word（.docx）
+- **两段式转换**：先由 Spire.Presentation 将 PPT 渲染为中间 PDF，再由 Spire.PDF 转换为 DOCX，临时文件自动清理
+- **无水印、无页数限制**：中间 PDF 由已解除限制的本地 DLL 生成，输出不含评估水印
+- **内存优化**：每次转换后强制 GC + 归还内存给操作系统
+- **批量转换**：支持同时添加多个 PPT 文件，逐个转换
+- **拖拽添加**：支持拖拽 PPT 文件到列表
 
 ### PDF 转 Word
 - **双引擎转换**：支持 Microsoft Office 和内置引擎（Spire.PDF）两种转换引擎，运行时自由切换
@@ -93,6 +117,8 @@
 | 文档转 PDF | `下载目录\文档转PDF\` |
 | Word 转 PDF | `下载目录\Word转PDF\` |
 | Excel 转 PDF | `下载目录\Excel转PDF\` |
+| PPT 转 PDF | `下载目录\PPT转PDF\` |
+| PPT 转 Word | `下载目录\PPT转Word\` |
 | PDF 转 Word | `下载目录\PDF转Word\` |
 | PDF 转 Excel | `下载目录\PDF转Excel\` |
 | PDF 转 PPT | `下载目录\PDF转PPT\` |
@@ -103,11 +129,12 @@
 
 ## 使用
 
-1. 点击左侧功能菜单切换到对应界面
-2. 点击「添加文件」按钮或直接拖拽文件到列表
-3. 按需求选择转换引擎 / 拆分方式 / 图片参数
-4. 点击「执行转换」
-5. 转换完成后自动打开输出目录
+1. 程序启动后进入**首页**，可点击功能按钮，或在顶部搜索框输入关键词（如 `PDF`、`PPT`）快速筛选功能
+2. 进入功能页后，也可通过**左侧功能菜单**切换其他功能；点击左上角「🏠 首页」可返回主页
+3. 点击「添加文件」按钮或直接拖拽文件到列表
+4. 按需求选择转换引擎 / 拆分方式 / 图片参数
+5. 点击「执行转换」
+6. 转换完成后自动打开输出目录
 
 > 输出目录可在设置窗口中修改默认保存目录后生效，各功能的子目录会自动创建。
 
@@ -140,6 +167,7 @@ publish_single.bat
 - **Spire.PDF**（PDF 转 Word 内置引擎，本地 DLL 引用，无需 Office）
 - **Spire.Doc**（Word 转 PDF 内置引擎，本地 DLL 引用，无需 Office）
 - **Spire.XLS**（Excel 转 PDF 内置引擎，本地 DLL 引用，无需 Office）
+- **Spire.Presentation**（PPT 转 PDF / PPT 转 Word 内置引擎，本地 DLL 引用，无需 Office）
 - **DocumentFormat.OpenXml**（DOCX 合并 / 去水印）
 - Word COM 自动化（PDF 转 Word，3 层回退创建真实 Word 实例）
 - PdfPig 开源 PDF 文本提取（PDF 转 Excel、拆分 PDF（PdfDocumentBuilder）、合并 PDF）
