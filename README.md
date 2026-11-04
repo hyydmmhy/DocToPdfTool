@@ -1,6 +1,6 @@
 # DocToPdfTool
 
-多功能文档格式转换工具，支持 **文档转 PDF**、**Word 转 PDF**、**Excel 转 PDF**、**Excel 转图片**、**PPT 转 PDF**、**PPT 转 Word**、**PPT 转图片**、**Word 转图片**、**图片转 PDF**、**PDF 加密**、**PDF 转 Word**、**PDF 转 Excel**、**PDF 转 PPT**、**PDF 转图片**、**PDF 转扫描件**、**拆分 PDF** 和 **合并 PDF** 等多种转换功能。
+多功能文档格式转换工具，支持 **文档转 PDF**、**Word 转 PDF**、**Excel 转 PDF**、**Excel 转图片**、**PPT 转 PDF**、**PPT 转 Word**、**PPT 转图片**、**Word 转图片**、**图片转 PDF**、**PDF 加密/解密**、**PDF 水印**、**PDF 页面管理**、**PDF 提取图片**、**PDF 转 Word**、**PDF 转 Excel**、**PDF 转 PPT**、**PDF 转图片**、**PDF 转扫描件**、**拆分 PDF** 和 **合并 PDF** 等 21 项功能。
 
 ![DocToPdfTool](icons/DocToPdfTool.png)
 
@@ -38,6 +38,18 @@
 - **批量转换**：支持同时添加多个 Excel 文件，逐个转换
 - **拖拽添加**：支持拖拽 Excel 文件到列表
 
+### Excel 转图片
+- **内置引擎，无需外部依赖**：本地 DLL 渲染，无需安装 Microsoft Office 或 WPS
+- **每表一图**：每张有内容的工作表输出为一张完整图片，命名 `工作簿名_工作表名.png`
+- **内容不截断**：整表按内容缩放到单页再渲染，一张表的内容完整呈现在一张图内，不会被分页切开
+- **自动裁边**：图片尺寸贴合表格实际内容，不含 A4 纸张的多余空白边距
+- **输出整洁**：转换结果不含附加标注文字与提示页
+- **尺寸保护**：超大表（如数千行）超出位图上限时自动下调 DPI（下限 24），保证单图完整输出不崩溃
+- **可调参数**：支持 DPI（96/150/300，默认 150）、输出格式（JPG/PNG，默认 PNG 无损）
+- **临时文件自动清理**：逐表中转 PDF 与分页图片在转换结束后删除（带句柄重试）
+- **批量转换**：支持同时添加多个 Excel 文件，逐个转换
+- **拖拽添加**：支持拖拽 Excel 文件到列表
+
 ### PPT 转 PDF
 - **内置引擎，无需外部依赖**：基于 Spire.Presentation 本地 DLL，无需安装 Microsoft Office 或 WPS
 - **格式支持**：PowerPoint（.ppt/.pptx）
@@ -54,18 +66,6 @@
 - **内存优化**：每次转换后强制 GC + 归还内存给操作系统
 - **批量转换**：支持同时添加多个 PPT 文件，逐个转换
 - **拖拽添加**：支持拖拽 PPT 文件到列表
-
-### Excel 转图片
-- **内置引擎，无需外部依赖**：本地 DLL 渲染，无需安装 Microsoft Office 或 WPS
-- **每表一图**：每张有内容的工作表输出为一张完整图片，命名 `工作簿名_工作表名.png`
-- **内容不截断**：整表按内容缩放到单页再渲染，一张表的内容完整呈现在一张图内，不会被分页切开
-- **自动裁边**：图片尺寸贴合表格实际内容，不含 A4 纸张的多余空白边距
-- **输出整洁**：转换结果不含附加标注文字与提示页
-- **尺寸保护**：超大表（如数千行）超出位图上限时自动下调 DPI（下限 24），保证单图完整输出不崩溃
-- **可调参数**：支持 DPI（96/150/300，默认 150）、输出格式（JPG/PNG，默认 PNG 无损）
-- **临时文件自动清理**：逐表中转 PDF 与分页图片在转换结束后删除（带句柄重试）
-- **批量转换**：支持同时添加多个 Excel 文件，逐个转换
-- **拖拽添加**：支持拖拽 Excel 文件到列表
 
 ### PPT 转图片
 - **内置引擎，无需外部依赖**：基于 Spire.Presentation 本地 DLL，无需安装 Microsoft Office 或 WPS
@@ -93,24 +93,6 @@
 - **Microsoft Office 引擎**：基于 Word COM 自动化，质量高但需要安装 Office
 - **批量转换**：支持同时添加多个 PDF 文件，逐个转换
 - **拖拽添加**：支持拖拽 PDF 文件到列表
-
-### PDF 转 Excel
-- **PdfPig 解析引擎**：基于 PdfPig 开源 PDF 文本提取库，不依赖 Office 组件
-- **表格自动识别**：智能检测页面的表格结构，自动识别列边界和表头
-- **文本换行合并**：自动合并因单元格内文本换行而被拆分的行，还原表格原始结构
-- **页眉页脚过滤**：自动去除 PDF 页面的页眉页脚干扰内容
-- **非表格降级**：非表格页面自动降级为文本行输出，避免数据丢失
-- **多页支持**：多页 PDF 每页生成独立 Sheet，单页则输出为 Sheet1
-- **Excel 原生写入**：纯 XML 方式生成 `.xlsx` 文件，无需 Excel 或任何 Office 组件
-- **拖拽添加**：支持拖拽 PDF 文件到列表
-
-### PDF 转 PPT
-- **Windows 内置引擎**：基于 Windows 10/11 内置 PDF 渲染引擎（`Windows.Data.Pdf`），无需额外安装软件
-- **图片转 PPT**：将 PDF 每页渲染为图片后嵌入 PPTX 幻灯片，保持原始排版
-- **批量转换**：支持同时添加多个 PDF 文件，每个文件生成独立 PPTX
-- **拖拽添加**：支持拖拽 PDF 文件到列表
-- **零依赖**：不依赖 pdfium.dll、Ghostscript 或 Office 组件
-- **兼容性好**：生成的 PPTX 在 WPS 和 Microsoft Office PowerPoint 中均可正常打开
 
 ### PDF 转图片
 - **Windows 内置引擎**：基于 Windows 10/11 内置 PDF 渲染引擎（`Windows.Data.Pdf`），无需额外安装软件
@@ -189,6 +171,24 @@
 - **加密文件识别**：自动检测并提示先用「PDF 加密 → 移除密码」解除
 - **批量处理**：单个失败不影响其余，结束后汇总提取张数
 
+### PDF 转 Excel
+- **PdfPig 解析引擎**：基于 PdfPig 开源 PDF 文本提取库，不依赖 Office 组件
+- **表格自动识别**：智能检测页面的表格结构，自动识别列边界和表头
+- **文本换行合并**：自动合并因单元格内文本换行而被拆分的行，还原表格原始结构
+- **页眉页脚过滤**：自动去除 PDF 页面的页眉页脚干扰内容
+- **非表格降级**：非表格页面自动降级为文本行输出，避免数据丢失
+- **多页支持**：多页 PDF 每页生成独立 Sheet，单页则输出为 Sheet1
+- **Excel 原生写入**：纯 XML 方式生成 `.xlsx` 文件，无需 Excel 或任何 Office 组件
+- **拖拽添加**：支持拖拽 PDF 文件到列表
+
+### PDF 转 PPT
+- **Windows 内置引擎**：基于 Windows 10/11 内置 PDF 渲染引擎（`Windows.Data.Pdf`），无需额外安装软件
+- **图片转 PPT**：将 PDF 每页渲染为图片后嵌入 PPTX 幻灯片，保持原始排版
+- **批量转换**：支持同时添加多个 PDF 文件，每个文件生成独立 PPTX
+- **拖拽添加**：支持拖拽 PDF 文件到列表
+- **零依赖**：不依赖 pdfium.dll、Ghostscript 或 Office 组件
+- **兼容性好**：生成的 PPTX 在 WPS 和 Microsoft Office PowerPoint 中均可正常打开
+
 ### PDF 转扫描件
 - **Windows 内置引擎**：基于 Windows 10/11 内置 PDF 渲染引擎（`Windows.Data.Pdf`），无需额外安装软件
 - **图片型 PDF**：将 PDF 每页渲染为图片后嵌入新 PDF，文字不可选取编辑
@@ -246,7 +246,7 @@
 1. 程序启动后进入**首页**，可点击功能按钮，或在顶部搜索框输入关键词（如 `PDF`、`PPT`）快速筛选功能
 2. 进入功能页后，也可通过**左侧功能菜单**切换其他功能；点击左上角「🏠 首页」可返回主页
 3. 点击「添加文件」按钮或直接拖拽文件到列表
-4. 按需求选择转换引擎 / 拆分方式 / 图片参数
+4. 按需求选择转换引擎 / 拆分方式 / 图片参数 / 水印与页码范围
 5. 点击「执行转换」
 6. 转换完成后自动打开输出目录
 
@@ -278,18 +278,18 @@ publish_single.bat
 - .NET Framework 4.8 / WPF
 - COM 自动化（WPS / Office 后期绑定）
 - Edge Chromium headless（HTML 转 PDF）
-- **Spire.PDF 12.10.7**（PDF 转 Word / PPT 转 Word 中段，本地 DLL 引用，无需 Office）
+- **Spire.PDF 12.10.7**（PDF 转 Word / PPT 转 Word 中段，PDF 水印绘制、PDF 页面重排与旋转、PDF 提取图片的引擎解码兜底；本地 DLL 引用，无需 Office）
 - **Spire.Doc 14.10.9**（Word 转 PDF / Word 转图片，本地 DLL 引用，无需 Office）
 - **Spire.XLS 16.10.3**（Excel 转 PDF，以及 Excel 转图片的中间 PDF 生成；本地 DLL 引用，无需 Office）
 - **Spire.Presentation 11.10.4**（PPT 转 PDF / PPT 转 Word / PPT 转图片，本地 DLL 引用，无需 Office）
 - **矢量 EMF 重渲染**（Word 转图片：`Spire.Doc.SaveToImages(Metafile)` + GDI+ 按目标 DPI 绘制）
 - **DocumentFormat.OpenXml**（DOCX 合并 / 内容清理）
 - Word COM 自动化（PDF 转 Word，3 层回退创建真实 Word 实例）
-- PdfPig 开源 PDF 文本提取（PDF 转 Excel、拆分 PDF（PdfDocumentBuilder）、合并 PDF）
+- PdfPig 开源 PDF 解析（PDF 转 Excel 文本提取、拆分/合并的 PdfDocumentBuilder、PDF 提取图片的原始字节直取与 SHA-256 去重）
 - 纯 XML xlsx 生成（`ZipArchive` + `XElement`，零 Office 依赖）
 - Win32 API 窗口守卫（抑制 Office 弹窗）
 - WMI 进程监控 + WinEventHook（Word 窗口自动隐藏）
-- Windows.Data.Pdf 内置 PDF 渲染引擎（PDF 转图片/PPT/扫描件、Excel 转图片，Windows 10+）
+- Windows.Data.Pdf 内置 PDF 渲染引擎（PDF 转图片/PPT/扫描件、Excel 转图片、PDF 页面管理缩略图，Windows 10+）
 - 纯 XML pptx 生成（`ZipArchive` + `XElement`，图片嵌入幻灯片，零 Office 依赖）
 - 纯 .NET PDF 写入（`BinaryWriter` + PDF 规范，零依赖嵌入 JPEG 图片；PDF 转扫描件 / 图片转 PDF 共用）
 - ini 配置（`%APPDATA%\DocToPdfTool\config.ini`，默认保存目录持久化）
