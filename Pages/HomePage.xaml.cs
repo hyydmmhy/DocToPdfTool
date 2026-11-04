@@ -23,6 +23,7 @@ namespace DocToPdfTool.Pages
             ("PdfToPpt", "PDF转PPT", "📑"),
             ("PdfToImage", "PDF转图片", "🖼️"),
             ("ImageToPdf", "图片转PDF", "📄"),
+            ("PdfEncrypt", "PDF加密", "🔒"),
             ("PdfToScannedPdf", "PDF转扫描件", "📄"),
             ("PdfSplit", "拆分PDF", "✂️"),
             ("PdfMerge", "合并PDF", "🔗")
