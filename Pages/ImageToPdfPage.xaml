@@ -1,0 +1,141 @@
+<UserControl x:Class="DocToPdfTool.Pages.ImageToPdfPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="White">
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- 工具栏 -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,8">
+            <Button x:Name="BtnAddFiles" Content="添加图片" Padding="16,6"
+                    Click="BtnAddFiles_Click"/>
+            <Button x:Name="BtnMoveUp" Content="↑ 上移" Padding="12,4" Margin="8,0,0,0"
+                    Click="BtnMoveUp_Click"/>
+            <Button x:Name="BtnMoveDown" Content="↓ 下移" Padding="12,4" Margin="6,0,0,0"
+                    Click="BtnMoveDown_Click"/>
+            <TextBlock x:Name="TxtDropHint" Text="或拖拽图片到此处（顺序即页序）"
+                       VerticalAlignment="Center" Foreground="#999999" FontSize="12"
+                       Margin="12,0,0,0"/>
+        </StackPanel>
+
+        <!-- 图片列表 -->
+        <ListView Grid.Row="1" x:Name="FileListView"
+                  AllowDrop="True"
+                  Drop="FileListView_Drop"
+                  PreviewDragOver="FileListView_PreviewDragOver"
+                  SizeChanged="FileListView_SizeChanged"
+                  BorderBrush="#E0E0E0" BorderThickness="1"
+                  Foreground="#1A1A1A"
+                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                  ScrollViewer.VerticalScrollBarVisibility="Auto">
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="ToolTip">
+                        <Setter.Value>
+                            <ToolTip>
+                                <StackPanel>
+                                    <TextBlock Text="{Binding FileName}" FontWeight="Bold"/>
+                                    <TextBlock Text="{Binding FilePath}" Foreground="#666666"/>
+                                    <TextBlock Text="{Binding SizeText}" Foreground="#666666"/>
+                                </StackPanel>
+                            </ToolTip>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </ListView.ItemContainerStyle>
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="预览" Width="64">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Border Width="52" Height="40" Background="#FAFAFA"
+                                        BorderBrush="#E8E8E8" BorderThickness="1" Margin="0,2">
+                                    <Image Source="{Binding Thumbnail}" Stretch="Uniform" Margin="1"/>
+                                </Border>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="文件名" Width="200"
+                                    DisplayMemberBinding="{Binding FileName}"/>
+                    <GridViewColumn Header="尺寸" Width="110"
+                                    DisplayMemberBinding="{Binding SizeText}"/>
+                    <GridViewColumn Header="路径" Width="200"
+                                    DisplayMemberBinding="{Binding FilePath}"/>
+                    <GridViewColumn Header="操作" Width="60">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Content="移除" Padding="8,2" FontSize="12"
+                                        Tag="{Binding}"
+                                        Click="BtnRemoveFile_Click"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+
+        <!-- 空状态提示 -->
+        <Border Grid.Row="1" x:Name="EmptyOverlay" Background="White"
+                IsHitTestVisible="False" Visibility="Visible">
+            <TextBlock Text="拖拽图片到此处，或点击上方「添加图片」按钮"
+                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                       Foreground="#BBBBBB" FontSize="14"/>
+        </Border>
+
+        <!-- 设置区域 -->
+        <Border Grid.Row="2" BorderBrush="#E0E0E0" BorderThickness="0,1,0,0" Padding="0,10,0,8">
+            <StackPanel HorizontalAlignment="Center">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <TextBlock Text="页面尺寸:" VerticalAlignment="Center" Foreground="#888888" FontSize="12"/>
+                    <ComboBox x:Name="CmbPageMode" SelectedIndex="0" Margin="6,0,16,0" Width="132">
+                        <ComboBoxItem Content="A4 适应（推荐）"/>
+                        <ComboBoxItem Content="A4 铺满"/>
+                        <ComboBoxItem Content="原始尺寸"/>
+                    </ComboBox>
+
+                    <TextBlock Text="边距:" VerticalAlignment="Center" Foreground="#888888" FontSize="12"/>
+                    <ComboBox x:Name="CmbMargin" SelectedIndex="2" Margin="6,0,16,0" Width="72">
+                        <ComboBoxItem Content="0 mm"/>
+                        <ComboBoxItem Content="5 mm"/>
+                        <ComboBoxItem Content="10 mm"/>
+                        <ComboBoxItem Content="20 mm"/>
+                    </ComboBox>
+
+                    <TextBlock Text="输出方式:" VerticalAlignment="Center" Foreground="#888888" FontSize="12"/>
+                    <ComboBox x:Name="CmbOutputMode" SelectedIndex="0" Margin="6,0,0,0" Width="160"
+                              SelectionChanged="CmbOutputMode_SelectionChanged">
+                        <ComboBoxItem Content="合成一个 PDF"/>
+                        <ComboBoxItem Content="每张图各出一个 PDF"/>
+                    </ComboBox>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,8,0,0">
+                    <TextBlock Text="文件名:" VerticalAlignment="Center" Foreground="#888888" FontSize="12"/>
+                    <TextBox x:Name="TxtFileName" Width="200" Height="26" Margin="6,0,0,0"
+                             VerticalContentAlignment="Center"/>
+                    <TextBlock Text=".pdf" VerticalAlignment="Center"
+                               Foreground="#888888" FontSize="12" Margin="4,0,0,0"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <!-- 转换按钮 -->
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,12,0,8">
+            <Button x:Name="BtnConvert" Content="生成 PDF"
+                    Padding="24,8" Width="160"
+                    Click="BtnConvert_Click"/>
+        </StackPanel>
+
+        <!-- 状态提示 -->
+        <TextBlock Grid.Row="4" x:Name="TxtConversionStatus"
+                   Foreground="#999999" FontSize="12"
+                   HorizontalAlignment="Center"
+                   Margin="0,4,0,0" Text=""/>
+    </Grid>
+</UserControl>

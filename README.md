@@ -1,6 +1,6 @@
 # DocToPdfTool
 
-多功能文档格式转换工具，支持 **文档转 PDF**、**Word 转 PDF**、**Excel 转 PDF**、**Excel 转图片**、**PPT 转 PDF**、**PPT 转 Word**、**PPT 转图片**、**Word 转图片**、**PDF 转 Word**、**PDF 转 Excel**、**PDF 转 PPT**、**PDF 转图片**、**PDF 转扫描件**、**拆分 PDF** 和 **合并 PDF** 等多种转换功能。
+多功能文档格式转换工具，支持 **文档转 PDF**、**Word 转 PDF**、**Excel 转 PDF**、**Excel 转图片**、**PPT 转 PDF**、**PPT 转 Word**、**PPT 转图片**、**Word 转图片**、**图片转 PDF**、**PDF 转 Word**、**PDF 转 Excel**、**PDF 转 PPT**、**PDF 转图片**、**PDF 转扫描件**、**拆分 PDF** 和 **合并 PDF** 等多种转换功能。
 
 ![DocToPdfTool](icons/DocToPdfTool.png)
 
@@ -120,6 +120,25 @@
 - **像素上限保护**：单页超过 2.5 亿像素时自动等比缩小，避免 GDI+ 位图内存溢出
 - **零依赖**：不依赖 pdfium.dll、Ghostscript 或 Office 组件
 
+### 图片转 PDF
+- **零依赖**：纯 .NET 直接写入 PDF 1.4（`BinaryWriter` + DCTDecode），不依赖任何 PDF 库或 Office 组件
+- **两种输出方式**：
+  - `合成一个 PDF`（默认）— 所有图片按列表顺序合成一个 PDF，一张图一页
+  - `每张图各出一个 PDF` — 每张图片单独生成一个 PDF，命名 `文件名_001.pdf`、`文件名_002.pdf` …
+- **JPEG 无损嵌入**：普通 JPEG 原图以 DCTDecode 直接嵌入，不重编码，画质零损失、速度更快
+- **格式转换**：PNG / BMP / GIF / TIFF 自动铺白底后转 JPEG 嵌入（PDF 不支持透明通道）
+- **EXIF 方向纠正**：自动读取手机竖拍照片的方向标记并旋转到正确朝向
+- **三档页面尺寸**：
+  - `A4 适应`（默认）— 等比缩放放进 A4，按图片横竖自动选择纸张方向，四周留白
+  - `A4 铺满` — 等比放大填满 A4，超出部分居中裁切
+  - `原始尺寸` — 按图片自身 DPI 换算物理尺寸
+- **边距可选**：0 / 5 / 10 / 20 mm（默认 10 mm）
+- **顺序调整**：列表顺序即页序，支持上移 / 下移 / 移除，也支持拖拽一次追加多张
+- **缩略图预览**：列表显示缩略图与原始像素尺寸，便于核对顺序
+- **大图保护**：长边超过 5000 px 自动降采样，避免解码内存峰值过高
+- **容错**：单张图片损坏或格式不支持时跳过并提示，不中断整个任务
+- **重名保护**：输出文件重名时自动追加序号
+
 ### PDF 转扫描件
 - **Windows 内置引擎**：基于 Windows 10/11 内置 PDF 渲染引擎（`Windows.Data.Pdf`），无需额外安装软件
 - **图片型 PDF**：将 PDF 每页渲染为图片后嵌入新 PDF，文字不可选取编辑
@@ -162,6 +181,7 @@
 | PDF 转 Excel | `下载目录\PDF转Excel\` |
 | PDF 转 PPT | `下载目录\PDF转PPT\` |
 | PDF 转图片 | `下载目录\PDF转图片\` |
+| 图片转 PDF | `下载目录\图片转PDF\` |
 | PDF 转扫描件 | `下载目录\PDF转扫描件\` |
 | 拆分 PDF | `下载目录\拆分PDF\` |
 | 合并 PDF | `下载目录\合并PDF\` |
@@ -216,7 +236,7 @@ publish_single.bat
 - WMI 进程监控 + WinEventHook（Word 窗口自动隐藏）
 - Windows.Data.Pdf 内置 PDF 渲染引擎（PDF 转图片/PPT/扫描件、Excel 转图片，Windows 10+）
 - 纯 XML pptx 生成（`ZipArchive` + `XElement`，图片嵌入幻灯片，零 Office 依赖）
-- 纯 .NET PDF 写入（`BinaryWriter` + PDF 规范，零依赖嵌入 JPEG 图片）
+- 纯 .NET PDF 写入（`BinaryWriter` + PDF 规范，零依赖嵌入 JPEG 图片；PDF 转扫描件 / 图片转 PDF 共用）
 - ini 配置（`%APPDATA%\DocToPdfTool\config.ini`，默认保存目录持久化）
 - Costura.Fody（单文件打包）
 
