@@ -36,6 +36,8 @@
                     <ListBoxItem Tag="ExcelToPdf" Content="Excel转PDF" FontSize="14"/>
                     <ListBoxItem Tag="PptToPdf" Content="PPT转PDF" FontSize="14"/>
                     <ListBoxItem Tag="PptToWord" Content="PPT转Word" FontSize="14"/>
+                    <ListBoxItem Tag="PptToImage" Content="PPT转图片" FontSize="14"/>
+                    <ListBoxItem Tag="WordToImage" Content="Word转图片" FontSize="14"/>
                     <ListBoxItem Tag="PdfToWord" Content="PDF转Word" FontSize="14"/>
                     <ListBoxItem Tag="PdfToImage" Content="PDF转图片" FontSize="14"/>
                     <ListBoxItem Tag="PdfToExcel" Content="PDF转Excel" FontSize="14"/>

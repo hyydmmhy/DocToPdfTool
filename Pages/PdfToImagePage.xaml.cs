@@ -99,14 +99,14 @@ namespace DocToPdfTool.Pages
             string defaultOutputDir = AppConfig.GetFeatureOutputDir("PDF转图片");
 
             // 读取设置
-            double scale = 1.5;
+            double scale = 1.0;
             if (CmbScale.SelectedItem is ComboBoxItem scaleItem &&
                 double.TryParse(scaleItem.Content.ToString(), out double parsedScale))
             {
                 scale = parsedScale;
             }
 
-            int dpi = 300;
+            int dpi = 150;
             if (CmbDpi.SelectedItem is ComboBoxItem dpiItem &&
                 int.TryParse(dpiItem.Content.ToString(), out int parsedDpi))
             {

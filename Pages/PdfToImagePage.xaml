@@ -75,7 +75,7 @@
         <Border Grid.Row="2" BorderBrush="#E0E0E0" BorderThickness="0,1,0,0" Padding="0,12,0,8">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                 <TextBlock Text="缩放倍率:" VerticalAlignment="Center" Foreground="#888888" FontSize="12"/>
-                <ComboBox x:Name="CmbScale" SelectedIndex="1" Margin="6,0,24,0" Width="60">
+                <ComboBox x:Name="CmbScale" SelectedIndex="0" Margin="6,0,24,0" Width="60">
                     <ComboBoxItem Content="1"/>
                     <ComboBoxItem Content="1.5"/>
                     <ComboBoxItem Content="2"/>
@@ -91,10 +91,10 @@
                 </ComboBox>
 
                 <TextBlock Text="DPI:" VerticalAlignment="Center" Foreground="#888888" FontSize="12"/>
-                <ComboBox x:Name="CmbDpi" SelectedIndex="1" Margin="6,0,0,0" Width="70">
+                <ComboBox x:Name="CmbDpi" SelectedIndex="2" Margin="6,0,0,0" Width="70">
+                    <ComboBoxItem Content="72"/>
+                    <ComboBoxItem Content="96"/>
                     <ComboBoxItem Content="150"/>
-                    <ComboBoxItem Content="300"/>
-                    <ComboBoxItem Content="600"/>
                 </ComboBox>
             </StackPanel>
         </Border>

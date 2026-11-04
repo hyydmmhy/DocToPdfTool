@@ -1,6 +1,6 @@
 # DocToPdfTool
 
-多功能文档格式转换工具，支持 **文档转 PDF**、**Word 转 PDF**、**Excel 转 PDF**、**PPT 转 PDF**、**PPT 转 Word**、**PDF 转 Word**、**PDF 转 Excel**、**PDF 转 PPT**、**PDF 转图片**、**PDF 转扫描件**、**拆分 PDF** 和 **合并 PDF** 等多种转换功能。
+多功能文档格式转换工具，支持 **文档转 PDF**、**Word 转 PDF**、**Excel 转 PDF**、**PPT 转 PDF**、**PPT 转 Word**、**PPT 转图片**、**Word 转图片**、**PDF 转 Word**、**PDF 转 Excel**、**PDF 转 PPT**、**PDF 转图片**、**PDF 转扫描件**、**拆分 PDF** 和 **合并 PDF** 等多种转换功能。
 
 ![DocToPdfTool](icons/DocToPdfTool.png)
 
@@ -51,6 +51,25 @@
 - **批量转换**：支持同时添加多个 PPT 文件，逐个转换
 - **拖拽添加**：支持拖拽 PPT 文件到列表
 
+### PPT 转图片
+- **内置引擎，无需外部依赖**：基于 Spire.Presentation 本地 DLL，无需安装 Microsoft Office 或 WPS
+- **逐页导出**：每张幻灯片输出为独立图片，命名 `原文件名_1.png`、`原文件名_2.png` …
+- **无水印、无页数限制**：本地 DLL 已解除评估水印与试用期页数限制
+- **高质量渲染**：开启 `HighQualityImage` 高质量渲染，JPG 使用 100% 质量编码
+- **可调参数**：支持 DPI（96/150/300）、输出格式（JPG/PNG，默认 PNG 无损）
+- **内存优化**：每页完成即触发回调回收，转换结束强制 GC + 归还内存
+- **批量转换**：支持同时添加多个 PPT 文件，逐个转换
+- **拖拽添加**：支持拖拽 PPT 文件到列表
+
+### Word 转图片
+- **内置引擎，无需外部依赖**：基于 Spire.Doc 本地 DLL，无需安装 Microsoft Office 或 WPS
+- **矢量重渲染**：通过 `SaveToImages(ImageType.Metafile)` 取得矢量 EMF，再按目标 DPI 绘制，文字/表格完整且任意 DPI 下均清晰
+- **无水印、无页数限制**：本地 DLL 已解除评估水印与试用期页数限制
+- **可调参数**：支持 DPI（96/150/300）、输出格式（JPG/PNG，默认 PNG 无损）
+- **无 Office 副作用**：不启动 Word 进程，无窗口弹出，单文件耗时远低于 COM 方案
+- **批量转换**：支持同时添加多个 Word 文件，逐个转换
+- **拖拽添加**：支持拖拽 Word 文件到列表
+
 ### PDF 转 Word
 - **双引擎转换**：支持 Microsoft Office 和内置引擎（Spire.PDF）两种转换引擎，运行时自由切换
 - **内置引擎无需 Office**：基于 Spire.PDF，无需安装 Microsoft Office，无页数限制，无水印
@@ -81,7 +100,8 @@
 - **Windows 内置引擎**：基于 Windows 10/11 内置 PDF 渲染引擎（`Windows.Data.Pdf`），无需额外安装软件
 - **批量转换**：支持同时添加多个 PDF 文件，每页生成一张图片
 - **拖拽添加**：支持拖拽 PDF 文件到列表
-- **可调参数**：支持 DPI（150/300/600）、缩放倍率（1×~5×）、输出格式（JPG/PNG）
+- **可调参数**：支持 DPI（72/96/150，默认 150）、缩放倍率（1×~5×，默认 1×）、输出格式（JPG/PNG）
+- **像素上限保护**：单页超过 2.5 亿像素时自动等比缩小，避免 GDI+ 位图内存溢出
 - **零依赖**：不依赖 pdfium.dll、Ghostscript 或 Office 组件
 
 ### PDF 转扫描件
@@ -119,6 +139,8 @@
 | Excel 转 PDF | `下载目录\Excel转PDF\` |
 | PPT 转 PDF | `下载目录\PPT转PDF\` |
 | PPT 转 Word | `下载目录\PPT转Word\` |
+| PPT 转图片 | `下载目录\PPT转图片\` |
+| Word 转图片 | `下载目录\Word转图片\` |
 | PDF 转 Word | `下载目录\PDF转Word\` |
 | PDF 转 Excel | `下载目录\PDF转Excel\` |
 | PDF 转 PPT | `下载目录\PDF转PPT\` |
@@ -164,10 +186,11 @@ publish_single.bat
 - .NET Framework 4.8 / WPF
 - COM 自动化（WPS / Office 后期绑定）
 - Edge Chromium headless（HTML 转 PDF）
-- **Spire.PDF**（PDF 转 Word 内置引擎，本地 DLL 引用，无需 Office）
-- **Spire.Doc**（Word 转 PDF 内置引擎，本地 DLL 引用，无需 Office）
-- **Spire.XLS**（Excel 转 PDF 内置引擎，本地 DLL 引用，无需 Office）
-- **Spire.Presentation**（PPT 转 PDF / PPT 转 Word 内置引擎，本地 DLL 引用，无需 Office）
+- **Spire.PDF 12.10.7**（PDF 转 Word / PPT 转 Word 中段，本地 DLL 引用，无需 Office；已解除评估水印与页数限制）
+- **Spire.Doc 14.10.9**（Word 转 PDF / Word 转图片，本地 DLL 引用，无需 Office；已解除评估水印与页数限制）
+- **Spire.XLS 16.10.3**（Excel 转 PDF，本地 DLL 引用，无需 Office；通过内部激活信息注入解除水印、推广页与页数限制）
+- **Spire.Presentation 11.10.4**（PPT 转 PDF / PPT 转 Word / PPT 转图片，本地 DLL 引用，无需 Office；已解除评估水印与页数限制）
+- **矢量 EMF 重渲染**（Word 转图片：`Spire.Doc.SaveToImages(Metafile)` + GDI+ 按目标 DPI 绘制）
 - **DocumentFormat.OpenXml**（DOCX 合并 / 去水印）
 - Word COM 自动化（PDF 转 Word，3 层回退创建真实 Word 实例）
 - PdfPig 开源 PDF 文本提取（PDF 转 Excel、拆分 PDF（PdfDocumentBuilder）、合并 PDF）
