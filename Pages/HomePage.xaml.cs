@@ -24,6 +24,9 @@ namespace DocToPdfTool.Pages
             ("PdfToImage", "PDF转图片", "🖼️"),
             ("ImageToPdf", "图片转PDF", "📄"),
             ("PdfEncrypt", "PDF加密", "🔒"),
+            ("PdfWatermark", "PDF水印", "💧"),
+            ("PdfPageManager", "PDF页面管理", "📑"),
+            ("PdfImageExtract", "PDF提取图片", "🖼️"),
             ("PdfToScannedPdf", "PDF转扫描件", "📄"),
             ("PdfSplit", "拆分PDF", "✂️"),
             ("PdfMerge", "合并PDF", "🔗")

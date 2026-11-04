@@ -1,0 +1,177 @@
+<UserControl x:Class="DocToPdfTool.Pages.PdfWatermarkPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="White">
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- 工具栏 -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,8">
+            <Button x:Name="BtnAddFiles" Content="添加PDF文件" Padding="16,6"
+                    Click="BtnAddFiles_Click"/>
+            <TextBlock x:Name="TxtDropHint" Text="或拖拽PDF文件到此处"
+                       VerticalAlignment="Center" Foreground="#999999" FontSize="12"
+                       Margin="12,0,0,0"/>
+        </StackPanel>
+
+        <!-- 文件列表 -->
+        <ListView Grid.Row="1" x:Name="FileListView"
+                  AllowDrop="True"
+                  Drop="FileListView_Drop"
+                  PreviewDragOver="FileListView_PreviewDragOver"
+                  SizeChanged="FileListView_SizeChanged"
+                  BorderBrush="#E0E0E0" BorderThickness="1"
+                  Foreground="#1A1A1A"
+                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                  ScrollViewer.VerticalScrollBarVisibility="Auto">
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="ToolTip">
+                        <Setter.Value>
+                            <ToolTip>
+                                <StackPanel>
+                                    <TextBlock Text="{Binding FileName}" FontWeight="Bold"/>
+                                    <TextBlock Text="{Binding FilePath}" Foreground="#666666"/>
+                                </StackPanel>
+                            </ToolTip>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </ListView.ItemContainerStyle>
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="文件名" Width="240"
+                                    DisplayMemberBinding="{Binding FileName}"/>
+                    <GridViewColumn Header="页数" Width="70"
+                                    DisplayMemberBinding="{Binding PageText}"/>
+                    <GridViewColumn Header="状态" Width="120"
+                                    DisplayMemberBinding="{Binding StatusText}"/>
+                    <GridViewColumn Header="路径" Width="200"
+                                    DisplayMemberBinding="{Binding FilePath}"/>
+                    <GridViewColumn Header="操作" Width="60">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Content="移除" Padding="8,2" FontSize="12"
+                                        Tag="{Binding}"
+                                        Click="BtnRemoveFile_Click"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+
+        <!-- 空状态提示 -->
+        <Border Grid.Row="1" x:Name="EmptyOverlay" Background="White"
+                IsHitTestVisible="False" Visibility="Visible">
+            <TextBlock Text="拖拽PDF文件到此处，或点击上方「添加PDF文件」按钮"
+                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                       Foreground="#BBBBBB" FontSize="14"/>
+        </Border>
+
+        <!-- 设置区域（固定高度、顶部对齐，避免列表跳动） -->
+        <Border Grid.Row="2" BorderBrush="#E0E0E0" BorderThickness="0,1,0,0" Padding="0,6,0,6"
+                Height="150">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Top">
+
+                <!-- 类型 + 内容 -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Height="26">
+                    <TextBlock Text="水印类型:" VerticalAlignment="Center" Foreground="#888888" FontSize="12"/>
+                    <RadioButton x:Name="RdoText" Content="文字" IsChecked="True" Margin="10,0,0,0"
+                                 GroupName="WmType" VerticalAlignment="Center"
+                                 Checked="Type_Changed"/>
+                    <RadioButton x:Name="RdoImage" Content="图片" Margin="14,0,0,0"
+                                 GroupName="WmType" VerticalAlignment="Center"
+                                 Checked="Type_Changed"/>
+
+                    <TextBlock Text="内容:" VerticalAlignment="Center" Foreground="#888888"
+                               FontSize="12" Margin="16,0,0,0"/>
+                    <TextBox x:Name="TxtText" Width="180" Height="26" Margin="6,0,0,0"
+                             VerticalContentAlignment="Center" Text="机密"/>
+
+                    <Button x:Name="BtnPickImage" Content="选择图片" Padding="10,4" Margin="8,0,0,0"
+                            Click="BtnPickImage_Click" IsEnabled="False"/>
+                    <TextBlock x:Name="TxtImageName" Text="未选择"
+                               VerticalAlignment="Center" Foreground="#AAAAAA" FontSize="11"
+                               Margin="8,0,0,0" MaxWidth="120" TextTrimming="CharacterEllipsis"/>
+                </StackPanel>
+
+                <!-- 外观参数 -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,6,0,0" Height="26">
+                    <TextBlock Text="字号:" VerticalAlignment="Center" Foreground="#888888" FontSize="12"/>
+                    <TextBox x:Name="TxtFontSize" Width="52" Height="26" Margin="6,0,0,0"
+                             VerticalContentAlignment="Center" Text="48"/>
+
+                    <TextBlock Text="颜色:" VerticalAlignment="Center" Foreground="#888888"
+                               FontSize="12" Margin="12,0,0,0"/>
+                    <ComboBox x:Name="CmbColor" SelectedIndex="0" Width="80" Margin="6,0,0,0"
+                              VerticalAlignment="Center">
+                        <ComboBoxItem Content="灰色"/>
+                        <ComboBoxItem Content="红色"/>
+                        <ComboBoxItem Content="蓝色"/>
+                        <ComboBoxItem Content="黑色"/>
+                    </ComboBox>
+
+                    <TextBlock Text="透明度:" VerticalAlignment="Center" Foreground="#888888"
+                               FontSize="12" Margin="12,0,0,0"/>
+                    <ComboBox x:Name="CmbOpacity" SelectedIndex="2" Width="70" Margin="6,0,0,0"
+                              VerticalAlignment="Center">
+                        <ComboBoxItem Content="10%"/>
+                        <ComboBoxItem Content="20%"/>
+                        <ComboBoxItem Content="30%"/>
+                        <ComboBoxItem Content="50%"/>
+                        <ComboBoxItem Content="70%"/>
+                    </ComboBox>
+
+                    <TextBlock Text="角度:" VerticalAlignment="Center" Foreground="#888888"
+                               FontSize="12" Margin="12,0,0,0"/>
+                    <ComboBox x:Name="CmbRotation" SelectedIndex="1" Width="76" Margin="6,0,0,0"
+                              VerticalAlignment="Center">
+                        <ComboBoxItem Content="0°"/>
+                        <ComboBoxItem Content="45°"/>
+                        <ComboBoxItem Content="30°"/>
+                        <ComboBoxItem Content="90°"/>
+                    </ComboBox>
+                </StackPanel>
+
+                <!-- 平铺 + 页码范围 -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,6,0,0" Height="24">
+                    <CheckBox x:Name="ChkTile" Content="平铺铺满整页" FontSize="12"
+                              VerticalAlignment="Center" Margin="0,0,18,0"/>
+
+                    <TextBlock Text="页面范围:" VerticalAlignment="Center" Foreground="#888888" FontSize="12"/>
+                    <TextBox x:Name="TxtPageRanges" Width="150" Height="24" Margin="6,0,0,0"
+                             VerticalContentAlignment="Center"/>
+                    <TextBlock Text="留空=全部页，支持 1-3,5"
+                               VerticalAlignment="Center" Foreground="#AAAAAA" FontSize="11"
+                               Margin="8,0,0,0"/>
+                </StackPanel>
+
+                <!-- 提示 -->
+                <TextBlock x:Name="TxtHint" HorizontalAlignment="Center" Margin="0,4,0,0"
+                           Foreground="#8888AA" FontSize="11" Height="16"
+                           TextTrimming="CharacterEllipsis"
+                           Text="水印绘制在原有内容之上，不改变原文字层；加密文件需先移除密码"/>
+            </StackPanel>
+        </Border>
+
+        <!-- 执行按钮 -->
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,6">
+            <Button x:Name="BtnExecute" Content="开始添加水印"
+                    Padding="24,8" Width="170"
+                    Click="BtnExecute_Click"/>
+        </StackPanel>
+
+        <!-- 状态提示（固定高度） -->
+        <TextBlock Grid.Row="4" x:Name="TxtStatus"
+                   Foreground="#999999" FontSize="12" Height="18"
+                   HorizontalAlignment="Center"
+                   Margin="0,4,0,0" Text=""/>
+    </Grid>
+</UserControl>
