@@ -10,9 +10,9 @@ using Spire.Presentation;
 namespace DocToPdfTool.Utils
 {
     /// <summary>
-    /// 基于 Spire.Presentation 的 PPT 转图片转换器。
-    /// 使用本地破解版 Spire.Presentation.dll（Libs\Spire.Presentation.dll），
-    /// 已解除评估水印和页数限制，无需 Microsoft Office，逐页导出图片。
+    /// 基于本地 Presentation 引擎的 PPT 转图片转换器。
+    /// 使用 Libs\Spire.Presentation.dll 本地引用，
+    /// 无需 Microsoft Office，逐页导出高质量图片。
     /// </summary>
     public class PptToImageConverterSpire : IDisposable
     {

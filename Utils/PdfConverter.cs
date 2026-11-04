@@ -218,21 +218,8 @@ namespace DocToPdfTool.Utils
             dynamic xls = _wpsApp.Application.Workbooks.Open(sourceFile);
             try
             {
-                int sheetCount = xls.Worksheets.Count;
-                for (int i = 1; i <= sheetCount; i++)
-                {
-                    dynamic sheet = xls.Worksheets[i];
-                    sheet.Activate();
-
-                    dynamic usedRange = sheet.UsedRange;
-                    usedRange.Columns.AutoFit();
-
-                    dynamic pageSetup = sheet.PageSetup;
-                    pageSetup.Zoom = false;
-                    pageSetup.FitToPagesWide = 1;
-                    pageSetup.FitToPagesTall = 0;
-                }
-
+                // 不做任何页面设置调整：直接沿用表格自身的打印设置导出，
+                // 输出效果与 WPS 里「输出为 PDF」完全一致
                 ((dynamic)xls.Worksheets[1]).Activate();
 
                 // XlFixedFormatType.xlTypePDF = 0, XlFixedFormatQuality.xlQualityStandard = 0

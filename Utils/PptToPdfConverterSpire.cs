@@ -7,10 +7,9 @@ using Spire.Presentation;
 namespace DocToPdfTool.Utils
 {
     /// <summary>
-    /// 基于 Spire.Presentation 的 PPT 转 PDF 转换器。
-    /// 使用本地破解版 Spire.Presentation.dll（Libs\Spire.Presentation.dll），
-    /// 已解除评估水印（Evaluation Warning）和页数限制（试用版仅输出前10页），
-    /// 无需 Microsoft Office，直接转换 PPT/PPTX → PDF。
+    /// 基于本地 Presentation 引擎的 PPT 转 PDF 转换器。
+    /// 使用 Libs\Spire.Presentation.dll 本地引用，
+    /// 无需 Microsoft Office，直接转换 PPT/PPTX → PDF，大页数文档完整输出。
     /// </summary>
     public class PptToPdfConverterSpire : IDisposable
     {
@@ -32,12 +31,12 @@ namespace DocToPdfTool.Utils
                 Directory.CreateDirectory(outputDir);
             }
 
-            // 使用 Spire.Presentation 加载并转换（破解版 DLL：无页数限制、无水印）
+            // 使用本地 Presentation 引擎加载并转换
             using (var presentation = new Presentation())
             {
                 presentation.LoadFromFile(pptPath);
 
-                // 转换所有页（破解版已解除10页试用限制）
+                // 全量转换所有幻灯片
                 presentation.SaveToFile(savePath, FileFormat.PDF);
             }
 

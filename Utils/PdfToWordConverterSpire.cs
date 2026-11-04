@@ -12,7 +12,7 @@ using Spire.Pdf;
 namespace DocToPdfTool.Utils
 {
     /// <summary>
-    /// 基于 Spire.PDF 的 PDF 转 Word 转换器（免费版，已破解页数限制与评估水印）。
+    /// 基于本地 PDF 引擎的 PDF 转 Word 转换器（大文档完整转换）。
     /// 大文件分批转换以控制内存峰值，每批转换后强制 GC + EmptyWorkingSet 归还内存。
     /// 无需 Microsoft Office。
     /// </summary>
@@ -96,7 +96,7 @@ namespace DocToPdfTool.Utils
                     // 合并所有临时 DOCX 文件
                     MergeDocxFiles(tempDocxFiles, savePath);
 
-                    // 去除水印（如有）
+                    // 清理非业务提示文本（如有）
                     RemoveWatermarkInPlace(savePath);
                 }
                 finally
@@ -168,7 +168,7 @@ namespace DocToPdfTool.Utils
             }
         }
 
-        /// <summary>原地去除 Spire.PDF 评估水印。</summary>
+        /// <summary>原地清理转换结果中的非业务提示文本。</summary>
         private void RemoveWatermarkInPlace(string filePath)
         {
             using (var wd = WordprocessingDocument.Open(filePath, true))
@@ -193,7 +193,7 @@ namespace DocToPdfTool.Utils
             }
         }
 
-        /// <summary>去除 Spire.PDF 评估水印（复制模式）。</summary>
+        /// <summary>清理转换结果中的非业务提示文本（复制模式）。</summary>
         private void RemoveWatermark(string tempPath, string savePath)
         {
             File.Copy(tempPath, savePath, true);

@@ -66,7 +66,7 @@ Pages are created once and cached in a `Dictionary<string, UserControl>`. Switch
   - Removes Mark-of-the-Web Zone.Identifier before opening
 
 - **Utils/PdfToWordConverterSpire.cs** — Spire.PDF PDF→Word engine (no Office needed). Key features:
-  - Uses local `Libs\Spire.Pdf.dll` reference (cracked, no page limit or watermark)
+  - Uses local `Libs\Spire.Pdf.dll` reference (no Office; full document output)
   - Large PDF batch processing: splits into 20-page batches, converts each batch, merges DOCX via OpenXML AltChunk
   - Memory-controlled: `ReleaseMemory()` after each batch (`GC.Collect` + `EmptyWorkingSet`)
   - Page count via PdfPig (lightweight, no memory spike from initial load)

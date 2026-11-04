@@ -1,6 +1,6 @@
 # DocToPdfTool
 
-多功能文档格式转换工具，支持 **文档转 PDF**、**Word 转 PDF**、**Excel 转 PDF**、**PPT 转 PDF**、**PPT 转 Word**、**PPT 转图片**、**Word 转图片**、**PDF 转 Word**、**PDF 转 Excel**、**PDF 转 PPT**、**PDF 转图片**、**PDF 转扫描件**、**拆分 PDF** 和 **合并 PDF** 等多种转换功能。
+多功能文档格式转换工具，支持 **文档转 PDF**、**Word 转 PDF**、**Excel 转 PDF**、**Excel 转图片**、**PPT 转 PDF**、**PPT 转 Word**、**PPT 转图片**、**Word 转图片**、**PDF 转 Word**、**PDF 转 Excel**、**PDF 转 PPT**、**PDF 转图片**、**PDF 转扫描件**、**拆分 PDF** 和 **合并 PDF** 等多种转换功能。
 
 ![DocToPdfTool](icons/DocToPdfTool.png)
 
@@ -17,7 +17,7 @@
 - **双引擎转换**：支持 WPS Office 和 Microsoft Office 两种转换引擎，运行时自由切换
 - **格式支持**：Word（.doc/.docx）、Excel（.xls/.xlsx）、PPT（.ppt/.pptx）、文本（.txt/.rtf）、HTML（.html/.htm/.mhtml）
 - **HTML 转换**：基于 Edge 浏览器 headless 模式，保留原始布局和样式
-- **Excel 多工作表**：自动列宽适配、分页控制，完整转换所有工作表
+- **Excel 多工作表**：不做额外页面设置改动，输出与 WPS / Office 自身「导出为 PDF」的默认打印效果一致，完整转换所有工作表
 - **批量转换**：支持添加/拖拽多个文档，逐文件显示转换进度
 - **拖拽添加**：支持拖拽文档到列表，列表中间显示操作提示
 
@@ -29,7 +29,11 @@
 ### Excel 转 PDF
 - **内置引擎，无需外部依赖**：基于 Spire.XLS 本地 DLL，无需安装 Microsoft Office 或 WPS
 - **格式支持**：Excel（.xls/.xlsx）
-- **无水印转换**：通过内部激活信息注入，输出 PDF 无水印、无推广页
+- **三档页面缩放**：
+  - `按宽度适应`（默认）— 所有列压缩到一页宽，行继续纵向分页，**列不会被横向切断**
+  - `整表缩放到单页` — 每张工作表输出为一页，小表一页看完
+  - `实际大小` — 完全按原表列宽分页，超宽时横向分页（还原 Excel 原生打印效果）
+- **输出整洁**：转换结果不含附加标注页与提示文字（引擎自动生成的提示工作表会自动剔除）
 - **内存优化**：转换前跳过公式重算、转换后自动清理引擎缓存，降低批量转换时的内存峰值
 - **批量转换**：支持同时添加多个 Excel 文件，逐个转换
 - **拖拽添加**：支持拖拽 Excel 文件到列表
@@ -37,7 +41,7 @@
 ### PPT 转 PDF
 - **内置引擎，无需外部依赖**：基于 Spire.Presentation 本地 DLL，无需安装 Microsoft Office 或 WPS
 - **格式支持**：PowerPoint（.ppt/.pptx）
-- **无水印、无页数限制**：本地 DLL 已解除评估水印与试用期页数限制，长文档可完整转换
+- **长文档完整转换**：本地 DLL 引擎支持大页数文档完整输出，内容不截断
 - **内存优化**：每次转换后强制 GC + 归还内存给操作系统，降低批量转换时的内存峰值
 - **批量转换**：支持同时添加多个 PPT 文件，逐个转换
 - **拖拽添加**：支持拖拽 PPT 文件到列表
@@ -46,15 +50,27 @@
 - **内置引擎，无需外部依赖**：基于本地 DLL（Spire.Presentation + Spire.PDF），无需安装 Microsoft Office 或 WPS
 - **格式支持**：PowerPoint（.ppt/.pptx）→ Word（.docx）
 - **两段式转换**：先由 Spire.Presentation 将 PPT 渲染为中间 PDF，再由 Spire.PDF 转换为 DOCX，临时文件自动清理
-- **无水印、无页数限制**：中间 PDF 由已解除限制的本地 DLL 生成，输出不含评估水印
+- **完整输出**：中间 PDF 由本地 DLL 生成，最终 DOCX 完整保留全部页面
 - **内存优化**：每次转换后强制 GC + 归还内存给操作系统
 - **批量转换**：支持同时添加多个 PPT 文件，逐个转换
 - **拖拽添加**：支持拖拽 PPT 文件到列表
 
+### Excel 转图片
+- **内置引擎，无需外部依赖**：本地 DLL 渲染，无需安装 Microsoft Office 或 WPS
+- **每表一图**：每张有内容的工作表输出为一张完整图片，命名 `工作簿名_工作表名.png`
+- **内容不截断**：整表按内容缩放到单页再渲染，一张表的内容完整呈现在一张图内，不会被分页切开
+- **自动裁边**：图片尺寸贴合表格实际内容，不含 A4 纸张的多余空白边距
+- **输出整洁**：转换结果不含附加标注文字与提示页
+- **尺寸保护**：超大表（如数千行）超出位图上限时自动下调 DPI（下限 24），保证单图完整输出不崩溃
+- **可调参数**：支持 DPI（96/150/300，默认 150）、输出格式（JPG/PNG，默认 PNG 无损）
+- **临时文件自动清理**：逐表中转 PDF 与分页图片在转换结束后删除（带句柄重试）
+- **批量转换**：支持同时添加多个 Excel 文件，逐个转换
+- **拖拽添加**：支持拖拽 Excel 文件到列表
+
 ### PPT 转图片
 - **内置引擎，无需外部依赖**：基于 Spire.Presentation 本地 DLL，无需安装 Microsoft Office 或 WPS
 - **逐页导出**：每张幻灯片输出为独立图片，命名 `原文件名_1.png`、`原文件名_2.png` …
-- **无水印、无页数限制**：本地 DLL 已解除评估水印与试用期页数限制
+- **长文档完整转换**：本地 DLL 引擎支持大页数文档完整输出，内容不截断
 - **高质量渲染**：开启 `HighQualityImage` 高质量渲染，JPG 使用 100% 质量编码
 - **可调参数**：支持 DPI（96/150/300）、输出格式（JPG/PNG，默认 PNG 无损）
 - **内存优化**：每页完成即触发回调回收，转换结束强制 GC + 归还内存
@@ -64,7 +80,7 @@
 ### Word 转图片
 - **内置引擎，无需外部依赖**：基于 Spire.Doc 本地 DLL，无需安装 Microsoft Office 或 WPS
 - **矢量重渲染**：通过 `SaveToImages(ImageType.Metafile)` 取得矢量 EMF，再按目标 DPI 绘制，文字/表格完整且任意 DPI 下均清晰
-- **无水印、无页数限制**：本地 DLL 已解除评估水印与试用期页数限制
+- **长文档完整转换**：本地 DLL 引擎支持大页数文档完整输出，内容不截断
 - **可调参数**：支持 DPI（96/150/300）、输出格式（JPG/PNG，默认 PNG 无损）
 - **无 Office 副作用**：不启动 Word 进程，无窗口弹出，单文件耗时远低于 COM 方案
 - **批量转换**：支持同时添加多个 Word 文件，逐个转换
@@ -72,7 +88,7 @@
 
 ### PDF 转 Word
 - **双引擎转换**：支持 Microsoft Office 和内置引擎（Spire.PDF）两种转换引擎，运行时自由切换
-- **内置引擎无需 Office**：基于 Spire.PDF，无需安装 Microsoft Office，无页数限制，无水印
+- **内置引擎无需 Office**：基于本地 PDF 引擎，无需安装 Microsoft Office，长文档完整转换
 - **大文件分批处理**：超过 20 页的 PDF 自动分批转换后合并，内存峰值可控
 - **Microsoft Office 引擎**：基于 Word COM 自动化，质量高但需要安装 Office
 - **批量转换**：支持同时添加多个 PDF 文件，逐个转换
@@ -137,6 +153,7 @@
 | 文档转 PDF | `下载目录\文档转PDF\` |
 | Word 转 PDF | `下载目录\Word转PDF\` |
 | Excel 转 PDF | `下载目录\Excel转PDF\` |
+| Excel 转图片 | `下载目录\Excel转图片\` |
 | PPT 转 PDF | `下载目录\PPT转PDF\` |
 | PPT 转 Word | `下载目录\PPT转Word\` |
 | PPT 转图片 | `下载目录\PPT转图片\` |
@@ -186,18 +203,18 @@ publish_single.bat
 - .NET Framework 4.8 / WPF
 - COM 自动化（WPS / Office 后期绑定）
 - Edge Chromium headless（HTML 转 PDF）
-- **Spire.PDF 12.10.7**（PDF 转 Word / PPT 转 Word 中段，本地 DLL 引用，无需 Office；已解除评估水印与页数限制）
-- **Spire.Doc 14.10.9**（Word 转 PDF / Word 转图片，本地 DLL 引用，无需 Office；已解除评估水印与页数限制）
-- **Spire.XLS 16.10.3**（Excel 转 PDF，本地 DLL 引用，无需 Office；通过内部激活信息注入解除水印、推广页与页数限制）
-- **Spire.Presentation 11.10.4**（PPT 转 PDF / PPT 转 Word / PPT 转图片，本地 DLL 引用，无需 Office；已解除评估水印与页数限制）
+- **Spire.PDF 12.10.7**（PDF 转 Word / PPT 转 Word 中段，本地 DLL 引用，无需 Office）
+- **Spire.Doc 14.10.9**（Word 转 PDF / Word 转图片，本地 DLL 引用，无需 Office）
+- **Spire.XLS 16.10.3**（Excel 转 PDF，以及 Excel 转图片的中间 PDF 生成；本地 DLL 引用，无需 Office）
+- **Spire.Presentation 11.10.4**（PPT 转 PDF / PPT 转 Word / PPT 转图片，本地 DLL 引用，无需 Office）
 - **矢量 EMF 重渲染**（Word 转图片：`Spire.Doc.SaveToImages(Metafile)` + GDI+ 按目标 DPI 绘制）
-- **DocumentFormat.OpenXml**（DOCX 合并 / 去水印）
+- **DocumentFormat.OpenXml**（DOCX 合并 / 内容清理）
 - Word COM 自动化（PDF 转 Word，3 层回退创建真实 Word 实例）
 - PdfPig 开源 PDF 文本提取（PDF 转 Excel、拆分 PDF（PdfDocumentBuilder）、合并 PDF）
 - 纯 XML xlsx 生成（`ZipArchive` + `XElement`，零 Office 依赖）
 - Win32 API 窗口守卫（抑制 Office 弹窗）
 - WMI 进程监控 + WinEventHook（Word 窗口自动隐藏）
-- Windows.Data.Pdf 内置 PDF 渲染引擎（PDF 转图片/PPT/扫描件，Windows 10+）
+- Windows.Data.Pdf 内置 PDF 渲染引擎（PDF 转图片/PPT/扫描件、Excel 转图片，Windows 10+）
 - 纯 XML pptx 生成（`ZipArchive` + `XElement`，图片嵌入幻灯片，零 Office 依赖）
 - 纯 .NET PDF 写入（`BinaryWriter` + PDF 规范，零依赖嵌入 JPEG 图片）
 - ini 配置（`%APPDATA%\DocToPdfTool\config.ini`，默认保存目录持久化）

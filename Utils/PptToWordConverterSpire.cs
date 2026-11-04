@@ -12,7 +12,7 @@ namespace DocToPdfTool.Utils
     /// <summary>
     /// 基于 Spire 的 PPT 转 Word 转换器。
     /// Spire.Presentation 不直接支持 DOCX 输出，采用两段式：
-    /// PPT → 临时PDF（Spire.Presentation，破解版无水印无页数限制）→ DOCX（Spire.Pdf）。
+    /// PPT → 临时PDF（本地 Presentation 引擎）→ DOCX（本地 PDF 引擎）。
     /// 无需 Microsoft Office。
     /// </summary>
     public class PptToWordConverterSpire : IDisposable
@@ -37,7 +37,7 @@ namespace DocToPdfTool.Utils
 
             try
             {
-                // 第一步：PPT → 临时PDF（Spire.Presentation，破解版无页数限制/水印）
+                // 第一步：PPT → 临时PDF（本地 Presentation 引擎）
                 using (var presentation = new Presentation())
                 {
                     presentation.LoadFromFile(pptPath);

@@ -79,42 +79,8 @@ namespace DocToPdfTool.Utils
                 dynamic xls = _officeApp.Application.Workbooks.Open(sourceFile);
                 try
                 {
-                    int sheetCount = xls.Worksheets.Count;
-                    for (int i = 1; i <= sheetCount; i++)
-                    {
-                        dynamic sheet = xls.Worksheets[i];
-                        try
-                        {
-                            sheet.Activate();
-
-                            dynamic usedRange = sheet.UsedRange;
-                            try
-                            {
-                                usedRange.Columns.AutoFit();
-                            }
-                            finally
-                            {
-                                if (usedRange != null) try { Marshal.ReleaseComObject((object)usedRange); } catch { }
-                            }
-
-                            dynamic pageSetup = sheet.PageSetup;
-                            try
-                            {
-                                var psType = pageSetup.GetType();
-                                psType.InvokeMember("Zoom", BindingFlags.SetProperty, null, pageSetup, new object[] { false });
-                                psType.InvokeMember("FitToPagesWide", BindingFlags.SetProperty, null, pageSetup, new object[] { 1 });
-                            }
-                            finally
-                            {
-                                if (pageSetup != null) try { Marshal.ReleaseComObject((object)pageSetup); } catch { }
-                            }
-                        }
-                        finally
-                        {
-                            try { Marshal.ReleaseComObject((object)sheet); } catch { }
-                        }
-                    }
-
+                    // 不做任何页面设置调整：直接沿用表格自身的打印设置导出，
+                    // 输出效果与 Excel 里「导出为 PDF」完全一致
                     dynamic firstSheet = xls.Worksheets[1];
                     try
                     {

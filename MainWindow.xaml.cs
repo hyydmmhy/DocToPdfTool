@@ -97,6 +97,7 @@ namespace DocToPdfTool
                         "DocToPdf" => new Pages.DocToPdfPage(),
                         "WordToPdf" => new Pages.WordToPdfPage(),
                         "ExcelToPdf" => new Pages.ExcelToPdfPage(),
+                        "ExcelToImage" => new Pages.ExcelToImagePage(),
                         "PptToPdf" => new Pages.PptToPdfPage(),
                         "PptToWord" => new Pages.PptToWordPage(),
                         "PptToImage" => new Pages.PptToImagePage(),

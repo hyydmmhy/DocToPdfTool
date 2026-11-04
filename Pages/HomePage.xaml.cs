@@ -13,6 +13,7 @@ namespace DocToPdfTool.Pages
             ("DocToPdf", "文档转PDF", "📄"),
             ("WordToPdf", "Word转PDF", "📝"),
             ("ExcelToPdf", "Excel转PDF", "📊"),
+            ("ExcelToImage", "Excel转图片", "🖼️"),
             ("PptToPdf", "PPT转PDF", "📑"),
             ("PptToWord", "PPT转Word", "📄"),
             ("PptToImage", "PPT转图片", "🖼️"),

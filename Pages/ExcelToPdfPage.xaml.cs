@@ -31,23 +31,35 @@ namespace DocToPdfTool.Pages
             if (_files.Count == 0) { MessageBox.Show("请先添加Excel文件", "提示", MessageBoxButton.OK, MessageBoxImage.Information); return; }
             var invalid = _files.FirstOrDefault(f => !File.Exists(f.FilePath));
             if (invalid != null) { MessageBox.Show($"文件不存在: {invalid.FilePath}", "错误", MessageBoxButton.OK, MessageBoxImage.Error); return; }
-            BtnConvert.IsEnabled = false; BtnAddFiles.IsEnabled = false; TxtConversionStatus.Text = "准备中...";
+            BtnConvert.IsEnabled = false; BtnAddFiles.IsEnabled = false; CmbScaleMode.IsEnabled = false; TxtConversionStatus.Text = "准备中...";
             var snap = _files.ToList();
-            try { await Task.Run(() => DoConversion(snap)); }
+            var scaleMode = GetSelectedScaleMode();
+            try { await Task.Run(() => DoConversion(snap, scaleMode)); }
             catch (Exception ex) { TxtConversionStatus.Text = $"转换失败: {ex.Message}"; MessageBox.Show(ex.Message, "转换错误", MessageBoxButton.OK, MessageBoxImage.Error); }
-            finally { BtnConvert.IsEnabled = true; BtnAddFiles.IsEnabled = true; ReleaseMemory(); }
+            finally { BtnConvert.IsEnabled = true; BtnAddFiles.IsEnabled = true; CmbScaleMode.IsEnabled = true; ReleaseMemory(); }
+        }
+        /// <summary>读取界面选择的页面缩放方式。</summary>
+        private ExcelScaleMode GetSelectedScaleMode()
+        {
+            switch (CmbScaleMode.SelectedIndex)
+            {
+                case 0: return ExcelScaleMode.FitWidth;
+                case 1: return ExcelScaleMode.FitSheetToOnePage;
+                case 2: return ExcelScaleMode.ActualSize;
+                default: return ExcelScaleMode.FitWidth;
+            }
         }
         private static void ReleaseMemory()
         { try { System.Runtime.GCSettings.LargeObjectHeapCompactionMode = System.Runtime.GCLargeObjectHeapCompactionMode.CompactOnce; GC.Collect(); GC.WaitForPendingFinalizers(); GC.Collect(); EmptyWorkingSet(Process.GetCurrentProcess().Handle); } catch { } }
         [DllImport("psapi.dll")] private static extern bool EmptyWorkingSet(IntPtr hProcess);
-        private void DoConversion(System.Collections.Generic.List<PdfFileItem> files)
+        private void DoConversion(System.Collections.Generic.List<PdfFileItem> files, ExcelScaleMode scaleMode)
         {
             string dir = AppConfig.GetFeatureOutputDir("Excel转PDF");
             int t = files.Count; int c = 0; var fails = new System.Collections.Generic.List<string>();
             foreach (var f in files)
             { c++; int i = c; Dispatcher.Invoke(() => TxtConversionStatus.Text = $"正在转换 ({i}/{t}) {f.FileName}");
                 if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
-                try { using (var conv = new ExcelToPdfConverterSpire()) conv.Convert(f.FilePath, dir); }
+                try { using (var conv = new ExcelToPdfConverterSpire()) conv.Convert(f.FilePath, dir, scaleMode); }
                 catch (Exception ex) { fails.Add($"{f.FileName}: {ex.Message}"); }
             }
             Dispatcher.Invoke(() => {
