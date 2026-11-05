@@ -277,19 +277,34 @@
 dotnet build -c Release
 ```
 
-### 单目录发布
-```bash
-publish_dir.bat
-```
-
-输出在 `publish\DirPublish\`（exe + 所有依赖 DLL）
-
-### 单文件发布
+### 单文件发布（发布给最终用户）
 ```bash
 publish_single.bat
 ```
+产物：`publish\Release\DocToPdfTool-v<版本>-win-x64.exe`（约 40 MB，双击即用，无需安装 .NET 运行时或任何依赖）
 
-输出在 `publish\SingleFile\DocToPdfTool.exe`
+### 单目录发布（GitHub Release 安装包）
+```bash
+publish_dir.bat
+```
+产物：`publish\Release\DocToPdfTool-v<版本>-win-x64.zip`（约 38 MB）
+
+zip 解压后是**同名文件夹**，内含 `DocToPdfTool.exe`、全部依赖 DLL 与 `README.md`，不会把文件散落在下载目录。
+
+### Release 附件
+
+两个脚本都会把最终产物统一放到 `publish\Release\`，并额外生成 `SHA256SUMS.txt` 供校验：
+
+```
+publish\Release\
+├─ DocToPdfTool-v1.0.0.18-win-x64.exe   ← 单文件版
+├─ DocToPdfTool-v1.0.0.18-win-x64.zip   ← 目录版（安装包）
+└─ SHA256SUMS.txt                        ← 两个产物的 SHA-256
+```
+
+- 版本号自动读取 `DocToPdfTool.csproj` 的 `<Version>`，发版只需改这一处
+- 中间产物位于 `publish\SingleFile\` 与 `publish\DirPublish\`
+- 构建时会自动剔除 `.xml` 文档、`.pdb` 调试符号与 `app.config`
 
 ## 技术栈
 
