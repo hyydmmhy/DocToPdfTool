@@ -1,0 +1,147 @@
+﻿<UserControl x:Class="DocToPdfTool.Pages.IdPhotoLayoutPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="White">
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- 工具栏 -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,8">
+            <Button x:Name="BtnAddFiles" Content="添加照片" Padding="16,6" Click="BtnAddFiles_Click"/>
+            <TextBlock Text="或拖拽照片到此处（建议使用正面免冠照）"
+                       VerticalAlignment="Center" Foreground="#999999" FontSize="12"
+                       Margin="12,0,0,0"/>
+        </StackPanel>
+
+        <!-- 文件列表 -->
+        <ListView Grid.Row="1" x:Name="FileListView"
+                  AllowDrop="True"
+                  Drop="FileListView_Drop"
+                  PreviewDragOver="FileListView_PreviewDragOver"
+                  SizeChanged="FileListView_SizeChanged"
+                  BorderBrush="#E0E0E0" BorderThickness="1"
+                  Foreground="#1A1A1A"
+                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                  ScrollViewer.VerticalScrollBarVisibility="Auto">
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="ToolTip">
+                        <Setter.Value>
+                            <ToolTip>
+                                <StackPanel>
+                                    <TextBlock Text="{Binding FileName}" FontWeight="Bold"/>
+                                    <TextBlock Text="{Binding FilePath}" Foreground="#666666"/>
+                                </StackPanel>
+                            </ToolTip>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </ListView.ItemContainerStyle>
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="照片" Width="220"
+                                    DisplayMemberBinding="{Binding FileName}"/>
+                    <GridViewColumn Header="尺寸" Width="100"
+                                    DisplayMemberBinding="{Binding SizeText}"/>
+                    <GridViewColumn Header="排版结果" Width="150"
+                                    DisplayMemberBinding="{Binding ResultText}"/>
+                    <GridViewColumn Header="状态" Width="80"
+                                    DisplayMemberBinding="{Binding StatusText}"/>
+                    <GridViewColumn Header="操作" Width="72">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Content="移除" Padding="6,2" FontSize="12"
+                                        MinWidth="46" HorizontalAlignment="Center"
+                                        Tag="{Binding}" Click="BtnRemoveFile_Click"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+
+        <!-- 空状态 -->
+        <Border Grid.Row="1" x:Name="EmptyOverlay" Background="White"
+                IsHitTestVisible="False" Visibility="Visible">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                <TextBlock Text="拖拽照片到此处，或点击上方「添加照片」按钮"
+                           Foreground="#BBBBBB" FontSize="14" HorizontalAlignment="Center"/>
+                <TextBlock Text="自动按标准证件照尺寸裁剪并排满整张相纸，直接打印即可"
+                           Foreground="#CCCCCC" FontSize="12" Margin="0,6,0,0"
+                           HorizontalAlignment="Center"/>
+            </StackPanel>
+        </Border>
+
+        <!-- 设置区（固定高度、顶部对齐） -->
+        <Border Grid.Row="2" BorderBrush="#E0E0E0" BorderThickness="0,1,0,0" Padding="0,6,0,6"
+                Height="124">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Top">
+
+                <!-- 规格 / 相纸 -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Height="26">
+                    <TextBlock Text="照片规格:" VerticalAlignment="Center" Foreground="#888888" FontSize="12"/>
+                    <ComboBox x:Name="CmbSize" SelectedIndex="1" Width="132" Margin="6,0,0,0"
+                              VerticalAlignment="Center" SelectionChanged="Option_Changed">
+                        <ComboBoxItem Content="小一寸 22×32 mm"/>
+                        <ComboBoxItem Content="一寸 25×35 mm"/>
+                        <ComboBoxItem Content="大一寸 33×48 mm"/>
+                        <ComboBoxItem Content="小二寸 35×45 mm"/>
+                        <ComboBoxItem Content="二寸 35×49 mm"/>
+                        <ComboBoxItem Content="大二寸 35×53 mm"/>
+                    </ComboBox>
+
+                    <TextBlock Text="相纸:" VerticalAlignment="Center" Foreground="#888888"
+                               FontSize="12" Margin="12,0,0,0"/>
+                    <ComboBox x:Name="CmbPaper" SelectedIndex="1" Width="104" Margin="6,0,0,0"
+                              VerticalAlignment="Center" SelectionChanged="Option_Changed">
+                        <ComboBoxItem Content="5 寸 127×89"/>
+                        <ComboBoxItem Content="6 寸 152×102"/>
+                        <ComboBoxItem Content="A4 210×297"/>
+                    </ComboBox>
+
+                    <TextBlock Text="间距:" VerticalAlignment="Center" Foreground="#888888"
+                               FontSize="12" Margin="12,0,0,0"/>
+                    <TextBox x:Name="TxtGap" Width="40" Height="26" Margin="6,0,0,0"
+                             VerticalContentAlignment="Center" Text="2"/>
+                    <TextBlock Text="mm" VerticalAlignment="Center" Foreground="#AAAAAA"
+                               FontSize="11" Margin="4,0,0,0"/>
+                </StackPanel>
+
+                <!-- 选项 -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,6,0,0" Height="26">
+                    <CheckBox x:Name="ChkCenterCrop" Content="按证件照比例居中裁剪" IsChecked="True"
+                              FontSize="12" VerticalAlignment="Center"
+                              ToolTip="关闭后会拉伸填满，人像可能变形"/>
+                    <TextBlock Text="分辨率: 300 DPI（打印推荐）"
+                               VerticalAlignment="Center" Foreground="#AAAAAA" FontSize="11"
+                               Margin="14,0,0,0"/>
+                </StackPanel>
+
+                <!-- 实时排布预览 -->
+                <TextBlock x:Name="TxtPreview" HorizontalAlignment="Center" Margin="0,4,0,0"
+                           Foreground="#0078D4" FontSize="11" Height="16"
+                           TextTrimming="CharacterEllipsis"
+                           Text=""/>
+            </StackPanel>
+        </Border>
+
+        <!-- 执行按钮 -->
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,6">
+            <Button x:Name="BtnExecute" Content="开始排版"
+                    Padding="24,8" Width="160"
+                    Click="BtnExecute_Click"/>
+        </StackPanel>
+
+        <!-- 状态提示（固定高度） -->
+        <TextBlock Grid.Row="4" x:Name="TxtStatus"
+                   Foreground="#999999" FontSize="12" Height="18"
+                   HorizontalAlignment="Center"
+                   Margin="0,4,0,0" Text=""/>
+    </Grid>
+</UserControl>

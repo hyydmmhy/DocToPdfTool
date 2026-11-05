@@ -28,6 +28,11 @@ namespace DocToPdfTool.Pages
             ("PdfPageManager", "PDF页面管理", "📑"),
             ("PdfImageExtract", "PDF提取图片", "🖼️"),
             ("PdfCompress", "PDF压缩", "🗜️"),
+            ("PdfPageNumber", "PDF加页码", "🔢"),
+            ("ExcelSplitMerge", "Excel拆分合并", "📊"),
+            ("ImageBatch", "图片批量处理", "🎨"),
+            ("IdPhotoLayout", "证件照排版", "🪪"),
+            ("TextExtract", "提取纯文本", "📝"),
             ("PdfToScannedPdf", "PDF转扫描件", "📄"),
             ("PdfSplit", "拆分PDF", "✂️"),
             ("PdfMerge", "合并PDF", "🔗")

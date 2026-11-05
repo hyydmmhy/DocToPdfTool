@@ -1,0 +1,121 @@
+<UserControl x:Class="DocToPdfTool.Pages.ExcelSplitMergePage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="White">
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- 工具栏 -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,8">
+            <Button x:Name="BtnAddFiles" Content="添加Excel文件" Padding="16,6" Click="BtnAddFiles_Click"/>
+            <TextBlock Text="或拖拽 Excel 文件到此处"
+                       VerticalAlignment="Center" Foreground="#999999" FontSize="12"
+                       Margin="12,0,0,0"/>
+        </StackPanel>
+
+        <!-- 文件列表 -->
+        <ListView Grid.Row="1" x:Name="FileListView"
+                  AllowDrop="True"
+                  Drop="FileListView_Drop"
+                  PreviewDragOver="FileListView_PreviewDragOver"
+                  SizeChanged="FileListView_SizeChanged"
+                  BorderBrush="#E0E0E0" BorderThickness="1"
+                  Foreground="#1A1A1A"
+                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                  ScrollViewer.VerticalScrollBarVisibility="Auto">
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="ToolTip">
+                        <Setter.Value>
+                            <ToolTip>
+                                <StackPanel>
+                                    <TextBlock Text="{Binding FileName}" FontWeight="Bold"/>
+                                    <TextBlock Text="{Binding FilePath}" Foreground="#666666"/>
+                                </StackPanel>
+                            </ToolTip>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </ListView.ItemContainerStyle>
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="文件名" Width="220"
+                                    DisplayMemberBinding="{Binding FileName}"/>
+                    <GridViewColumn Header="状态" Width="170"
+                                    DisplayMemberBinding="{Binding StatusText}"/>
+                    <GridViewColumn Header="操作" Width="72">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Content="移除" Padding="6,2" FontSize="12"
+                                        MinWidth="46" HorizontalAlignment="Center"
+                                        Tag="{Binding}" Click="BtnRemoveFile_Click"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+
+        <!-- 空状态 -->
+        <Border Grid.Row="1" x:Name="EmptyOverlay" Background="White"
+                IsHitTestVisible="False" Visibility="Visible">
+            <TextBlock Text="拖拽 Excel 文件到此处，或点击上方「添加Excel文件」按钮"
+                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                       Foreground="#BBBBBB" FontSize="14"/>
+        </Border>
+
+        <!-- 设置区（固定高度、顶部对齐） -->
+        <Border Grid.Row="2" BorderBrush="#E0E0E0" BorderThickness="0,1,0,0" Padding="0,6,0,6"
+                Height="120">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Top">
+
+                <!-- 模式 -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Height="26">
+                    <TextBlock Text="处理方式:" VerticalAlignment="Center" Foreground="#888888" FontSize="12"/>
+                    <RadioButton x:Name="RdoSplit" Content="按工作表拆分" IsChecked="True" Margin="10,0,0,0"
+                                 GroupName="Mode" VerticalAlignment="Center"
+                                 Checked="Mode_Changed" ToolTip="每个工作簿的每张工作表导出为独立文件"/>
+                    <RadioButton x:Name="RdoMerge" Content="合并为一个工作簿" Margin="16,0,0,0"
+                                 GroupName="Mode" VerticalAlignment="Center"
+                                 Checked="Mode_Changed" ToolTip="多个工作簿合并成一个，每张工作表都保留"/>
+                </StackPanel>
+
+                <!-- 选项 -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,6,0,0" Height="26">
+                    <CheckBox x:Name="ChkSkipHidden" Content="跳过隐藏工作表" IsChecked="True"
+                              FontSize="12" VerticalAlignment="Center"/>
+                    <CheckBox x:Name="ChkSkipEmpty" Content="跳过空工作表" IsChecked="True"
+                              FontSize="12" VerticalAlignment="Center" Margin="14,0,0,0"/>
+                    <CheckBox x:Name="ChkKeepNames" Content="合并时保留原表名" IsChecked="True"
+                              FontSize="12" VerticalAlignment="Center" Margin="14,0,0,0"
+                              ToolTip="仅合并模式有效：勾选=沿用原表名；不勾选=用「源文件名_表名」"/>
+                </StackPanel>
+
+                <!-- 提示 -->
+                <TextBlock x:Name="TxtHint" HorizontalAlignment="Center" Margin="0,4,0,0"
+                           Foreground="#8888AA" FontSize="11" Height="16"
+                           TextTrimming="CharacterEllipsis"
+                           Text="拆分：每个工作簿的每张工作表导出为独立文件；公式、格式、行列宽都会保留"/>
+            </StackPanel>
+        </Border>
+
+        <!-- 执行按钮 -->
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,6">
+            <Button x:Name="BtnExecute" Content="开始拆分"
+                    Padding="24,8" Width="160"
+                    Click="BtnExecute_Click"/>
+        </StackPanel>
+
+        <!-- 状态提示（固定高度） -->
+        <TextBlock Grid.Row="4" x:Name="TxtStatus"
+                   Foreground="#999999" FontSize="12" Height="18"
+                   HorizontalAlignment="Center"
+                   Margin="0,4,0,0" Text=""/>
+    </Grid>
+</UserControl>

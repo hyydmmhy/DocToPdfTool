@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
@@ -74,7 +74,7 @@ namespace DocToPdfTool.Utils
         }
 
         /// <summary>删除引擎自动生成的提示工作表（按表名识别）。</summary>
-        private static void RemoveNoticeSheets(Workbook wb)
+        internal static void RemoveNoticeSheets(Workbook wb)
         {
             try
             {
@@ -96,7 +96,7 @@ namespace DocToPdfTool.Utils
         /// 通过实例的 InternalLicense 属性挂载本地运行时许可对象，
         /// 使引擎按已配置状态输出，不附加额外标注内容。
         /// </summary>
-        private static void ApplyEngineLicense<T>(T t) where T : class
+        internal static void ApplyEngineLicense<T>(T t) where T : class
         {
             var prop = t.GetType().GetProperty("InternalLicense",
                 BindingFlags.NonPublic | BindingFlags.Instance);

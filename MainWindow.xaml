@@ -47,6 +47,11 @@
                     <ListBoxItem Tag="PdfPageManager" Content="PDF页面管理" FontSize="14"/>
                     <ListBoxItem Tag="PdfImageExtract" Content="PDF提取图片" FontSize="14"/>
                     <ListBoxItem Tag="PdfCompress" Content="PDF压缩" FontSize="14"/>
+                    <ListBoxItem Tag="PdfPageNumber" Content="PDF加页码" FontSize="14"/>
+                    <ListBoxItem Tag="ExcelSplitMerge" Content="Excel拆分合并" FontSize="14"/>
+                    <ListBoxItem Tag="ImageBatch" Content="图片批量处理" FontSize="14"/>
+                    <ListBoxItem Tag="IdPhotoLayout" Content="证件照排版" FontSize="14"/>
+                    <ListBoxItem Tag="TextExtract" Content="提取纯文本" FontSize="14"/>
                     <ListBoxItem Tag="PdfToExcel" Content="PDF转Excel" FontSize="14"/>
                     <ListBoxItem Tag="PdfToPpt" Content="PDF转PPT" FontSize="14"/>
                     <ListBoxItem Tag="PdfToScannedPdf" Content="PDF转扫描件" FontSize="14"/>
