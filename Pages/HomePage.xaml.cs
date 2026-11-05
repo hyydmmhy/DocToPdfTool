@@ -27,6 +27,7 @@ namespace DocToPdfTool.Pages
             ("PdfWatermark", "PDF水印", "💧"),
             ("PdfPageManager", "PDF页面管理", "📑"),
             ("PdfImageExtract", "PDF提取图片", "🖼️"),
+            ("PdfCompress", "PDF压缩", "🗜️"),
             ("PdfToScannedPdf", "PDF转扫描件", "📄"),
             ("PdfSplit", "拆分PDF", "✂️"),
             ("PdfMerge", "合并PDF", "🔗")

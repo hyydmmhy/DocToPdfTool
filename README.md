@@ -1,6 +1,6 @@
 # DocToPdfTool
 
-多功能文档格式转换工具，支持 **文档转 PDF**、**Word 转 PDF**、**Excel 转 PDF**、**Excel 转图片**、**PPT 转 PDF**、**PPT 转 Word**、**PPT 转图片**、**Word 转图片**、**图片转 PDF**、**PDF 加密/解密**、**PDF 水印**、**PDF 页面管理**、**PDF 提取图片**、**PDF 转 Word**、**PDF 转 Excel**、**PDF 转 PPT**、**PDF 转图片**、**PDF 转扫描件**、**拆分 PDF** 和 **合并 PDF** 等 21 项功能。
+多功能文档格式转换工具，支持 **文档转 PDF**、**Word 转 PDF**、**Excel 转 PDF**、**Excel 转图片**、**PPT 转 PDF**、**PPT 转 Word**、**PPT 转图片**、**Word 转图片**、**图片转 PDF**、**PDF 加密/解密**、**PDF 水印**、**PDF 页面管理**、**PDF 提取图片**、**PDF 压缩**、**PDF 转 Word**、**PDF 转 Excel**、**PDF 转 PPT**、**PDF 转图片**、**PDF 转扫描件**、**拆分 PDF** 和 **合并 PDF** 等 21 项功能。
 
 ![DocToPdfTool](icons/DocToPdfTool.png)
 
@@ -189,6 +189,23 @@
 - **零依赖**：不依赖 pdfium.dll、Ghostscript 或 Office 组件
 - **兼容性好**：生成的 PPTX 在 WPS 和 Microsoft Office PowerPoint 中均可正常打开
 
+### PDF 压缩
+- **内置引擎，无需外部依赖**：本地 PDF 引擎负责读写容器，图片的 DPI 与 JPEG 质量由程序自行控制
+- **自控画质**：先按「像素 ÷ 显示物理尺寸」算出每张图片的有效 DPI，超过目标值才重采样，再按指定质量重编码
+- **四档预设**：
+  - `轻度`（默认）— 不重采样，仅高质量重编码，画质接近原样
+  - `标准` — 重采样到 200 DPI + 质量 88，体积与画质平衡
+  - `强力` — 重采样到 150 DPI + 质量 82
+  - `极限` — 重采样到 110 DPI + 质量 75，体积最小
+  - `自定义` — 目标分辨率（不重采样 / 72~300 DPI）与 JPEG 质量（50~98）自由组合
+- **文字与矢量不动**：只处理图片，文字层完整保留，压缩后仍可搜索、可复制
+- **低分辨率图片不重编码**：有效 DPI 已低于目标的图片保持原样，避免无谓的画质损失
+- **跳过已最优文件**：压缩后体积收益不足 1% 或不足 1 KB 时不生成副本，列表状态提示「已是最优」
+- **加密文件识别**：自动检测并提示先用「PDF 加密 → 移除密码」解除
+- **结果对比**：列表实时显示 `原始大小 → 压缩后 → 压缩率`
+- **输出保护**：输出为 `原文件名_已压缩.pdf`，不覆盖原文件，重名自动追加序号
+- **批量处理**：单个失败不影响其余，结束后汇总压缩数 / 跳过数 / 失败数
+
 ### PDF 转扫描件
 - **Windows 内置引擎**：基于 Windows 10/11 内置 PDF 渲染引擎（`Windows.Data.Pdf`），无需额外安装软件
 - **图片型 PDF**：将 PDF 每页渲染为图片后嵌入新 PDF，文字不可选取编辑
@@ -212,34 +229,35 @@
 ## 设置
 
 - 点击右上角 **「≡ 设置」** 按钮打开设置窗口
-- 可查看和修改**默认保存目录**（未配置时默认取系统「下载」目录）
+- 可查看和修改**默认保存目录**（未配置时默认取系统「下载」目录）；所有功能的输出都会统一放在该目录下的 `DocToPdfTool` 子文件夹里
 - 设置保存在 `%APPDATA%\DocToPdfTool\config.ini`，永久生效
 
-所有转换结果默认输出到「下载目录」，并按功能名自动创建子目录存放（目录存在则不重复创建）：
+所有转换结果统一输出到「默认保存目录\DocToPdfTool」下，再按功能名自动创建子目录存放（目录存在则不重复创建）。这样各功能的产物都集中在一个 DocToPdfTool 文件夹里，不会散落在下载目录中：
 
 | 功能 | 输出子目录 |
 |------|-----------|
-| 文档转 PDF | `下载目录\文档转PDF\` |
-| Word 转 PDF | `下载目录\Word转PDF\` |
-| Excel 转 PDF | `下载目录\Excel转PDF\` |
-| Excel 转图片 | `下载目录\Excel转图片\` |
-| PPT 转 PDF | `下载目录\PPT转PDF\` |
-| PPT 转 Word | `下载目录\PPT转Word\` |
-| PPT 转图片 | `下载目录\PPT转图片\` |
-| Word 转图片 | `下载目录\Word转图片\` |
-| PDF 转 Word | `下载目录\PDF转Word\` |
-| PDF 转 Excel | `下载目录\PDF转Excel\` |
-| PDF 转 PPT | `下载目录\PDF转PPT\` |
-| PDF 转图片 | `下载目录\PDF转图片\` |
-| 图片转 PDF | `下载目录\图片转PDF\` |
-| PDF 加密 | `下载目录\PDF加密\` |
-| PDF 解密 | `下载目录\PDF解密\` |
-| PDF 水印 | `下载目录\PDF水印\` |
-| PDF 页面管理 | `下载目录\PDF页面管理\` |
-| PDF 提取图片 | `下载目录\PDF提取图片\` |
-| PDF 转扫描件 | `下载目录\PDF转扫描件\` |
-| 拆分 PDF | `下载目录\拆分PDF\` |
-| 合并 PDF | `下载目录\合并PDF\` |
+| 文档转 PDF | `下载目录\DocToPdfTool\文档转PDF\` |
+| Word 转 PDF | `下载目录\DocToPdfTool\Word转PDF\` |
+| Excel 转 PDF | `下载目录\DocToPdfTool\Excel转PDF\` |
+| Excel 转图片 | `下载目录\DocToPdfTool\Excel转图片\` |
+| PPT 转 PDF | `下载目录\DocToPdfTool\PPT转PDF\` |
+| PPT 转 Word | `下载目录\DocToPdfTool\PPT转Word\` |
+| PPT 转图片 | `下载目录\DocToPdfTool\PPT转图片\` |
+| Word 转图片 | `下载目录\DocToPdfTool\Word转图片\` |
+| PDF 转 Word | `下载目录\DocToPdfTool\PDF转Word\` |
+| PDF 转 Excel | `下载目录\DocToPdfTool\PDF转Excel\` |
+| PDF 转 PPT | `下载目录\DocToPdfTool\PDF转PPT\` |
+| PDF 转图片 | `下载目录\DocToPdfTool\PDF转图片\` |
+| 图片转 PDF | `下载目录\DocToPdfTool\图片转PDF\` |
+| PDF 加密 | `下载目录\DocToPdfTool\PDF加密\` |
+| PDF 解密 | `下载目录\DocToPdfTool\PDF解密\` |
+| PDF 水印 | `下载目录\DocToPdfTool\PDF水印\` |
+| PDF 页面管理 | `下载目录\DocToPdfTool\PDF页面管理\` |
+| PDF 提取图片 | `下载目录\DocToPdfTool\PDF提取图片\` |
+| PDF 压缩 | `下载目录\DocToPdfTool\PDF压缩\` |
+| PDF 转扫描件 | `下载目录\DocToPdfTool\PDF转扫描件\` |
+| 拆分 PDF | `下载目录\DocToPdfTool\拆分PDF\` |
+| 合并 PDF | `下载目录\DocToPdfTool\合并PDF\` |
 
 ## 使用
 

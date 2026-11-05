@@ -46,6 +46,7 @@
                     <ListBoxItem Tag="PdfWatermark" Content="PDF水印" FontSize="14"/>
                     <ListBoxItem Tag="PdfPageManager" Content="PDF页面管理" FontSize="14"/>
                     <ListBoxItem Tag="PdfImageExtract" Content="PDF提取图片" FontSize="14"/>
+                    <ListBoxItem Tag="PdfCompress" Content="PDF压缩" FontSize="14"/>
                     <ListBoxItem Tag="PdfToExcel" Content="PDF转Excel" FontSize="14"/>
                     <ListBoxItem Tag="PdfToPpt" Content="PDF转PPT" FontSize="14"/>
                     <ListBoxItem Tag="PdfToScannedPdf" Content="PDF转扫描件" FontSize="14"/>

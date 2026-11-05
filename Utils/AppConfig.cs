@@ -33,10 +33,19 @@ namespace DocToPdfTool.Utils
             WriteValue("Settings", "OutputDir", dir);
         }
 
-        /// <summary>获取某功能的输出目录（默认保存目录下以功能名命名的子目录），不存在则创建</summary>
+        /// <summary>
+        /// 所有功能输出统一的根目录名。
+        /// 默认保存目录（如「下载」）下先建这一层，再按功能名建子目录，
+        /// 例如：下载\DocToPdfTool\PDF压缩\，避免各功能目录直接散落在下载目录里。
+        /// </summary>
+        public const string OutputRootFolderName = "DocToPdfTool";
+
+        /// <summary>
+        /// 获取某功能的输出目录，结构为：默认保存目录\DocToPdfTool\功能名，不存在则创建。
+        /// </summary>
         public static string GetFeatureOutputDir(string featureName)
         {
-            var dir = Path.Combine(GetDefaultSaveDir(), featureName);
+            var dir = Path.Combine(GetDefaultSaveDir(), OutputRootFolderName, featureName);
             if (!Directory.Exists(dir))
                 Directory.CreateDirectory(dir);
             return dir;

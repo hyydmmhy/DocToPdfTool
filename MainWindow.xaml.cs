@@ -109,6 +109,7 @@ namespace DocToPdfTool
                         "PdfWatermark" => new Pages.PdfWatermarkPage(),
                         "PdfPageManager" => new Pages.PdfPageManagerPage(),
                         "PdfImageExtract" => new Pages.PdfImageExtractPage(),
+                        "PdfCompress" => new Pages.PdfCompressPage(),
                         "PdfToExcel" => new Pages.PdfToExcelPage(),
                         "PdfToPpt" => new Pages.PdfToPptPage(),
                         "PdfToScannedPdf" => new Pages.PdfToScannedPdfPage(),
