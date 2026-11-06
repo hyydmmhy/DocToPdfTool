@@ -115,6 +115,8 @@ namespace DocToPdfTool
                         "ImageBatch" => new Pages.ImageBatchPage(),
                         "IdPhotoLayout" => new Pages.IdPhotoLayoutPage(),
                         "TextExtract" => new Pages.TextExtractPage(),
+                        "Translate" => new Pages.TranslatePage(),
+                        "Ocr" => new Pages.OcrPage(),
                         "PdfToExcel" => new Pages.PdfToExcelPage(),
                         "PdfToPpt" => new Pages.PdfToPptPage(),
                         "PdfToScannedPdf" => new Pages.PdfToScannedPdfPage(),

@@ -28,6 +28,8 @@ if exist "%SURC%\DocToPdfTool.exe.config" del /q "%SURC%\DocToPdfTool.exe.config
 if exist "%SURC%\*.dll" del /q "%SURC%\*.dll"
 if exist "%SURC%\*.xml" del /q "%SURC%\*.xml"
 if exist "%SURC%\*.pdb" del /q "%SURC%\*.pdb"
+if exist "%SURC%\*.lib" del /q "%SURC%\*.lib"
+if exist "%SURC%\*.exp" del /q "%SURC%\*.exp"
 
 if not exist "%OUT%" mkdir "%OUT%"
 if exist "%OUT%\%NAME%.exe" del /q "%OUT%\%NAME%.exe"

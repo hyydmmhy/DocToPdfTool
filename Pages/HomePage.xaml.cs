@@ -33,6 +33,8 @@ namespace DocToPdfTool.Pages
             ("ImageBatch", "图片批量处理", "🎨"),
             ("IdPhotoLayout", "证件照排版", "🪪"),
             ("TextExtract", "提取纯文本", "📝"),
+            ("Translate", "文本翻译", "🌐"),
+            ("Ocr", "OCR文字识别", "🔍"),
             ("PdfToScannedPdf", "PDF转扫描件", "📄"),
             ("PdfSplit", "拆分PDF", "✂️"),
             ("PdfMerge", "合并PDF", "🔗")

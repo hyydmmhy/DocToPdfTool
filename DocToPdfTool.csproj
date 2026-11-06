@@ -2,14 +2,16 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net48</TargetFramework>
+    <PlatformTarget>x64</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
     <LangVersion>latest</LangVersion>
     <RootNamespace>DocToPdfTool</RootNamespace>
     <AssemblyName>DocToPdfTool</AssemblyName>
-    <Version>1.0.0.19</Version>
+    <Version>1.0.0.20</Version>
     <AssemblyTitle>DocToPdfTool</AssemblyTitle>
-    <Description>多功能文档格式转换工具，支持文档转PDF（WPS/Office双引擎+HTML转PDF）、Word转PDF、Excel转PDF、Excel转图片、PPT转PDF、PPT转Word、PPT转图片、Word转图片、图片转PDF、PDF加密/解密、PDF水印、PDF页面管理、PDF提取图片、PDF压缩、PDF加页码、Excel拆分/合并、图片批量处理、证件照排版、提取纯文本、PDF转Word（Office/Spire双引擎）、PDF转Excel、PDF转图片、PDF转PPT、PDF转扫描件、拆分/合并PDF</Description>
+    <Description>多功能文档格式转换工具，支持文档转PDF（WPS/Office双引擎+HTML转PDF）、Word转PDF、Excel转PDF、Excel转图片、PPT转PDF、PPT转Word、PPT转图片、Word转图片、图片转PDF、PDF加密/解密、PDF水印、PDF页面管理、PDF提取图片、PDF压缩、PDF加页码、Excel拆分/合并、图片批量处理、证件照排版、提取纯文本、文本翻译、OCR文字识别、PDF转Word（Office/Spire双引擎）、PDF转Excel、PDF转图片、PDF转PPT、PDF转扫描件、拆分/合并PDF</Description>
     <Company></Company>
     <Product>DocToPdfTool</Product>
     <Copyright>Copyright © 2026. MIT License.</Copyright>
@@ -24,6 +26,7 @@
     <PackageReference Include="Microsoft.Windows.SDK.Contracts" Version="10.0.19041.1" />
     <PackageReference Include="System.Runtime.WindowsRuntime" Version="4.7.0" />
     <PackageReference Include="UglyToad.PdfPig" Version="1.7.0-custom-5" />
+    <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.20.1" />
     <Reference Include="Spire.Pdf">
       <HintPath>Libs\Spire.Pdf.dll</HintPath>
       <Private>True</Private>
@@ -44,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System.Management" />
+    <Reference Include="System.Net.Http" />
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.IO.Compression.FileSystem" />
   </ItemGroup>
@@ -51,4 +55,22 @@
     <PackageReference Include="Costura.Fody" Version="5.7.0" PrivateAssets="all" />
     <PackageReference Include="Fody" Version="6.8.0" PrivateAssets="all" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\ocr_keys.txt">
+      <LogicalName>DocToPdfTool.ocr_keys.txt</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+  <!-- 单文件发布：先把 OnnxRuntime 原生库 gzip 压缩（11 MB → 约 4.2 MB）再内嵌，减小 exe 体积 -->
+  <Target Name="GzipOnnxRuntimeNative" BeforeTargets="BeforeBuild" Condition="'$(SingleFile)'=='true'">
+    <PropertyGroup>
+      <OrtNativeSource>$(NuGetPackageRoot)microsoft.ml.onnxruntime\1.20.1\runtimes\win-x64\native\onnxruntime.dll</OrtNativeSource>
+      <OrtNativeGzip>$(IntermediateOutputPath)onnxruntime.dll.gz</OrtNativeGzip>
+    </PropertyGroup>
+    <Exec Command="powershell -NoProfile -ExecutionPolicy Bypass -File &quot;$(MSBuildProjectDirectory)\build\gzip-ort.ps1&quot; -Source &quot;$(OrtNativeSource)&quot; -Target &quot;$(OrtNativeGzip)&quot;" />
+    <ItemGroup>
+      <EmbeddedResource Include="$(OrtNativeGzip)">
+        <LogicalName>DocToPdfTool.onnxruntime.dll.gz</LogicalName>
+      </EmbeddedResource>
+    </ItemGroup>
+  </Target>
 </Project>

@@ -52,6 +52,8 @@
                     <ListBoxItem Tag="ImageBatch" Content="图片批量处理" FontSize="14"/>
                     <ListBoxItem Tag="IdPhotoLayout" Content="证件照排版" FontSize="14"/>
                     <ListBoxItem Tag="TextExtract" Content="提取纯文本" FontSize="14"/>
+                    <ListBoxItem Tag="Translate" Content="文本翻译" FontSize="14"/>
+                    <ListBoxItem Tag="Ocr" Content="OCR文字识别" FontSize="14"/>
                     <ListBoxItem Tag="PdfToExcel" Content="PDF转Excel" FontSize="14"/>
                     <ListBoxItem Tag="PdfToPpt" Content="PDF转PPT" FontSize="14"/>
                     <ListBoxItem Tag="PdfToScannedPdf" Content="PDF转扫描件" FontSize="14"/>
