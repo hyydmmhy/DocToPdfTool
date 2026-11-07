@@ -47,6 +47,20 @@
                     <ListBoxItem Tag="PdfPageManager" Content="PDF页面管理" FontSize="14"/>
                     <ListBoxItem Tag="PdfImageExtract" Content="PDF提取图片" FontSize="14"/>
                     <ListBoxItem Tag="PdfCompress" Content="PDF压缩" FontSize="14"/>
+                    <ListBoxItem Tag="PdfToHtml" Content="PDF转HTML" FontSize="14"/>
+                    <ListBoxItem Tag="PdfToSvg" Content="PDF转SVG" FontSize="14"/>
+                    <ListBoxItem Tag="PdfToMarkdown" Content="PDF转MD" FontSize="14"/>
+                    <ListBoxItem Tag="PdfToGray" Content="PDF转灰度" FontSize="14"/>
+                    <ListBoxItem Tag="PdfToPdfA" Content="PDF转PDF/A" FontSize="14"/>
+                    <ListBoxItem Tag="PdfToXps" Content="PDF转XPS" FontSize="14"/>
+                    <ListBoxItem Tag="WordToMarkdown" Content="Word转MD" FontSize="14"/>
+                    <ListBoxItem Tag="WordToEpub" Content="Word转EPUB" FontSize="14"/>
+                    <ListBoxItem Tag="ExcelToCsv" Content="Excel转CSV" FontSize="14"/>
+                    <ListBoxItem Tag="PptToHtml" Content="PPT转HTML" FontSize="14"/>
+                    <ListBoxItem Tag="PptToTiff" Content="PPT转TIFF" FontSize="14"/>
+                    <ListBoxItem Tag="ExcelToHtml" Content="Excel转HTML" FontSize="14"/>
+                    <ListBoxItem Tag="ExcelToJson" Content="Excel转JSON" FontSize="14"/>
+                    <ListBoxItem Tag="ExcelToMd" Content="Excel转MD" FontSize="14"/>
                     <ListBoxItem Tag="PdfPageNumber" Content="PDF加页码" FontSize="14"/>
                     <ListBoxItem Tag="ExcelSplitMerge" Content="Excel拆分合并" FontSize="14"/>
                     <ListBoxItem Tag="ImageBatch" Content="图片批量处理" FontSize="14"/>

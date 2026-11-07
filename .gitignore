@@ -17,3 +17,6 @@ publish/
 ## OS
 Thumbs.db
 .DS_Store
+
+# 临时发布说明（本地填写用，不入库）
+RELEASE_NOTES_*.md
