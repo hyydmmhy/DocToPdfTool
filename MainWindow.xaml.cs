@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -17,11 +18,11 @@ namespace DocToPdfTool
             ShowHomePage();
         }
 
-        /// <summary>显示首页（隐藏左侧导航和顶栏，全窗口内容区）。</summary>
+        /// <summary>显示首页（隐藏左侧导航，全窗口内容区；右上角按钮常驻）。</summary>
         public void ShowHomePage()
         {
             SideNav.Visibility = Visibility.Collapsed;
-            TopBar.Visibility = Visibility.Collapsed;
+            TopBar.Visibility = Visibility.Visible;
             NavList.SelectedItem = null;
 
             if (!_pages.TryGetValue("Home", out var page))
@@ -159,6 +160,23 @@ namespace DocToPdfTool
         {
             var settingsWindow = new Pages.SettingsWindow { Owner = this };
             settingsWindow.ShowDialog();
+        }
+
+        /// <summary>打开 GitHub 仓库（默认浏览器）。</summary>
+        private void BtnGitHub_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                Process.Start(new ProcessStartInfo("https://github.com/hyydmmhy/DocToPdfTool")
+                {
+                    UseShellExecute = true
+                });
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("无法打开 GitHub 仓库: " + ex.Message,
+                    "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
         }
     }
 }

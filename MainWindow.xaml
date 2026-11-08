@@ -77,9 +77,14 @@
             </Grid>
         </Border>
 
-        <!-- 右上角：设置 + 置顶按钮（默认隐藏，功能页显示） -->
+        <!-- 右上角：GitHub + 设置 + 置顶按钮（首页与功能页均常驻显示） -->
         <StackPanel x:Name="TopBar" DockPanel.Dock="Top" Orientation="Horizontal"
-                    HorizontalAlignment="Right" Margin="0,8,12,0" Visibility="Collapsed">
+                    HorizontalAlignment="Right" Margin="0,8,12,0" Visibility="Visible">
+            <Button x:Name="BtnGitHub" Content="🌐" FontSize="16"
+                    Padding="8,0" Margin="0,0,8,0"
+                    ToolTip="GitHub 仓库"
+                    Click="BtnGitHub_Click"
+                    Background="Transparent" BorderBrush="Transparent"/>
             <Button x:Name="BtnSettings" Content="≡" FontSize="16"
                     Padding="8,0" Margin="0,0,8,0"
                     ToolTip="设置"
