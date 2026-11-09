@@ -1,0 +1,85 @@
+<UserControl x:Class="DocToPdfTool.Pages.QrCodePage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="White">
+    <TabControl Margin="16" BorderBrush="#E0E0E0">
+        <!-- Tab 1: 生成二维码 -->
+        <TabItem Header="生成二维码">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <StackPanel Margin="16" MaxWidth="700">
+                    <TextBlock Text="二维码内容" Foreground="#888888" Margin="0,0,0,6"/>
+                    <TextBox x:Name="TxtQrContent" Height="80"
+                             AcceptsReturn="True" TextWrapping="Wrap"
+                             VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Top" Padding="6,4"
+                             ToolTip="输入二维码内容"/>
+
+                    <TextBlock Text="二维码设置" Foreground="#888888" Margin="0,10,0,6"/>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="大小" VerticalAlignment="Center" Foreground="#666666"/>
+                        <TextBox x:Name="TxtQrSize" Width="80" Height="26" Margin="6,0,0,0"
+                                 VerticalContentAlignment="Center" Text="300"/>
+                        <TextBlock Text="纠错级别" VerticalAlignment="Center" Foreground="#666666"
+                                   Margin="24,0,0,0"/>
+                        <ComboBox x:Name="CbErrorLevel" Width="60" Margin="8,0,0,0"
+                                  SelectedIndex="1" VerticalContentAlignment="Center">
+                            <ComboBoxItem Content="L"/>
+                            <ComboBoxItem Content="M"/>
+                            <ComboBoxItem Content="Q"/>
+                            <ComboBoxItem Content="H"/>
+                        </ComboBox>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                        <CheckBox x:Name="ChkAddLogo" Content="添加Logo" VerticalAlignment="Center"
+                                  FontSize="13"/>
+                        <Button Content="选择Logo..." Padding="12,4" Margin="12,0,0,0"
+                                Click="BtnSelectLogo_Click"/>
+                        <TextBlock x:Name="TxtLogoPath" VerticalAlignment="Center" Margin="8,0,0,0"
+                                   Foreground="#999999" Text="未选择"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,12,0,12">
+                        <Button Content="生成二维码" Click="BtnGenerate_Click"/>
+                        <Button Content="保存" Margin="8,0,0,0" Click="BtnSaveQr_Click"/>
+                    </StackPanel>
+
+                    <TextBlock Text="预览" Foreground="#888888" Margin="0,0,0,6"/>
+                    <Border BorderBrush="#E0E0E0" BorderThickness="1"
+                            HorizontalAlignment="Center" Width="220" Height="220" Background="#F9F9F9">
+                        <Image x:Name="ImgQrPreview" Stretch="Uniform"/>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+        </TabItem>
+
+        <!-- Tab 2: 识别二维码 -->
+        <TabItem Header="识别二维码">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <StackPanel Margin="16" MaxWidth="700">
+                    <TextBlock Text="选择图片" Foreground="#888888" Margin="0,0,0,6"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                        <Button Content="选择图片" Click="BtnSelectImage_Click"/>
+                        <TextBlock x:Name="TxtImagePath" VerticalAlignment="Center" Margin="12,0,0,0"
+                                   Foreground="#999999" Text="未选择"/>
+                    </StackPanel>
+
+                    <TextBlock Text="图片预览" Foreground="#888888" Margin="0,0,0,6"/>
+                    <Border BorderBrush="#E0E0E0" BorderThickness="1"
+                            HorizontalAlignment="Center" Width="220" Height="220" Background="#F9F9F9"
+                            Margin="0,0,0,8">
+                        <Image x:Name="ImgDecodePreview" Stretch="Uniform"/>
+                    </Border>
+
+                    <TextBlock Text="识别结果" Foreground="#888888" Margin="0,0,0,6"/>
+                    <TextBox x:Name="TxtDecodeResult"
+                             IsReadOnly="True" AcceptsReturn="True" TextWrapping="Wrap"
+                             VerticalScrollBarVisibility="Auto" MinHeight="100"
+                             FontFamily="Consolas" VerticalContentAlignment="Top" Padding="6,4"/>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                        <Button Content="复制结果" Click="BtnCopyDecodeResult_Click"/>
+                    </StackPanel>
+                </StackPanel>
+            </ScrollViewer>
+        </TabItem>
+    </TabControl>
+</UserControl>

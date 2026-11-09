@@ -132,11 +132,14 @@ namespace DocToPdfTool
                         "TextExtract" => new Pages.TextExtractPage(),
                         "Translate" => new Pages.TranslatePage(),
                         "Ocr" => new Pages.OcrPage(),
+                        "QrCode" => new Pages.QrCodePage(),
                         "PdfToExcel" => new Pages.PdfToExcelPage(),
                         "PdfToPpt" => new Pages.PdfToPptPage(),
                         "PdfToScannedPdf" => new Pages.PdfToScannedPdfPage(),
+                        "PdfToLongImage" => new Pages.PdfToLongImagePage(),
                         "PdfSplit" => new Pages.PdfSplitPage(),
                         "PdfMerge" => new Pages.PdfMergePage(),
+                        "ImageStitch" => new Pages.ImageStitchPage(),
                         _ => throw new ArgumentException($"Unknown page: {pageKey}")
                     };
                     _pages[pageKey] = page;

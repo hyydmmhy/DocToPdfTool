@@ -68,11 +68,14 @@
                     <ListBoxItem Tag="TextExtract" Content="提取纯文本" FontSize="14"/>
                     <ListBoxItem Tag="Translate" Content="文本翻译" FontSize="14"/>
                     <ListBoxItem Tag="Ocr" Content="OCR文字识别" FontSize="14"/>
+                    <ListBoxItem Tag="QrCode" Content="二维码生成" FontSize="14"/>
                     <ListBoxItem Tag="PdfToExcel" Content="PDF转Excel" FontSize="14"/>
                     <ListBoxItem Tag="PdfToPpt" Content="PDF转PPT" FontSize="14"/>
                     <ListBoxItem Tag="PdfToScannedPdf" Content="PDF转扫描件" FontSize="14"/>
+                    <ListBoxItem Tag="PdfToLongImage" Content="PDF转长图" FontSize="14"/>
                     <ListBoxItem Tag="PdfSplit" Content="拆分PDF" FontSize="14"/>
                     <ListBoxItem Tag="PdfMerge" Content="合并PDF" FontSize="14"/>
+                    <ListBoxItem Tag="ImageStitch" Content="图片拼接" FontSize="14"/>
                 </ListBox>
             </Grid>
         </Border>

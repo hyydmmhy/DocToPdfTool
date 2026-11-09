@@ -49,9 +49,12 @@ namespace DocToPdfTool.Pages
             ("TextExtract", "提取纯文本", "📝"),
             ("Translate", "文本翻译", "🌐"),
             ("Ocr", "OCR文字识别", "🔍"),
+            ("QrCode", "二维码生成", "🔳"),
             ("PdfToScannedPdf", "PDF转扫描件", "📄"),
+            ("PdfToLongImage", "PDF转长图", "🖼️"),
             ("PdfSplit", "拆分PDF", "✂️"),
-            ("PdfMerge", "合并PDF", "🔗")
+            ("PdfMerge", "合并PDF", "🔗"),
+            ("ImageStitch", "图片拼接", "🖼️")
         };
 
         public HomePage()
