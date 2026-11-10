@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -284,29 +284,18 @@ namespace DocToPdfTool.Pages
             {
                 TxtStatus.Text = $"完成：压缩 {compressed} 个，跳过 {skipped.Count} 个，失败 {failures.Count} 个";
 
-                var msg = $"压缩完成\n\n成功压缩：{compressed} 个（共替换 {replacedTotal} 张图片）"
-                        + $"\n跳过（体积未明显减小）：{skipped.Count} 个"
-                        + $"\n失败：{failures.Count} 个"
-                        + $"\n\n输出目录：\n{dir}";
-
-                if (skipped.Count > 0)
-                {
-                    msg += "\n\n以下文件压缩收益不足，未生成副本：\n" + string.Join("\n", skipped.Take(8))
-                         + (skipped.Count > 8 ? $"\n… 共 {skipped.Count} 个" : "")
-                         + "\n\n可改用「标准」或「强力」再试。";
-                }
-                if (failures.Count > 0)
-                {
-                    msg += "\n\n失败原因：\n" + string.Join("\n", failures.Take(6))
-                         + (failures.Count > 6 ? $"\n… 共 {failures.Count} 个" : "");
-                }
-
-                MessageBox.Show(msg, "压缩结果", MessageBoxButton.OK,
-                    failures.Count > 0 ? MessageBoxImage.Warning : MessageBoxImage.Information);
-
+                // 完成不弹窗，自动打开输出目录（仅失败时弹错误提示）
                 if (compressed > 0)
                 {
                     try { Process.Start(dir); } catch { }
+                }
+
+                if (failures.Count > 0)
+                {
+                    var msg = "部分文件压缩失败：\n"
+                            + string.Join("\n", failures.Take(6))
+                            + (failures.Count > 6 ? $"\n… 共 {failures.Count} 个" : "");
+                    MessageBox.Show(msg, "部分文件失败", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
             });
         }

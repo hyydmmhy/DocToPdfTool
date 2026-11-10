@@ -47,6 +47,10 @@
                     <ListBoxItem Tag="PdfPageManager" Content="PDF页面管理" FontSize="14"/>
                     <ListBoxItem Tag="PdfImageExtract" Content="PDF提取图片" FontSize="14"/>
                     <ListBoxItem Tag="PdfCompress" Content="PDF压缩" FontSize="14"/>
+                    <ListBoxItem Tag="PdfCrop" Content="PDF裁剪" FontSize="14"/>
+                    <ListBoxItem Tag="PdfStamp" Content="PDF盖章" FontSize="14"/>
+                    <ListBoxItem Tag="PdfNup" Content="PDF拼版" FontSize="14"/>
+                    <ListBoxItem Tag="PdfRemoveWatermark" Content="PDF去水印" FontSize="14"/>
                     <ListBoxItem Tag="PdfToHtml" Content="PDF转HTML" FontSize="14"/>
                     <ListBoxItem Tag="PdfToSvg" Content="PDF转SVG" FontSize="14"/>
                     <ListBoxItem Tag="PdfToMarkdown" Content="PDF转MD" FontSize="14"/>
